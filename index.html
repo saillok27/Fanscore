@@ -1,1936 +1,838 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FanScore — Balkan Football Intelligence</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0c10"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Fanscore"/>
+<title>Fanscore</title>
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;800;900&display=swap" rel="stylesheet"/>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900;1,700&family=Barlow:wght@400;500;600&display=swap');
-
 :root {
-  --bg: #07080d;
-  --card: #0d1018;
-  --card2: #111520;
-  --green: #00e676;
-  --gold: #FFD700;
-  --red: #ff3d57;
-  --blue: #4fc3f7;
-  --border: #1a1f2e;
-  --muted: #3d4560;
-  --text: #e8ecf4;
+  --bg0:#060810; --bg1:#0a0d14; --bg2:#0f1520; --bg3:#151e2d; --bg4:#1a2535;
+  --teal:#00f0c8; --teal2:#00c9a7; --teal3:#007a66; --teal-glow:rgba(0,240,200,0.18);
+  --teal-dim:rgba(0,240,200,0.08); --gold:#f5c842; --gold2:#c49a10;
+  --silver:#9eb8c8; --red:#ff3d57; --blue:#4da8ff;
+  --txt:#e8edf5; --txt2:#7a90a8; --txt3:#3a4e62;
+  --border:rgba(0,240,200,0.12); --border2:rgba(255,255,255,0.06);
 }
-
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%}
+body{background:var(--bg0);color:var(--txt);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);}
+.ambient{position:fixed;top:-300px;left:50%;transform:translateX(-50%);width:800px;height:600px;pointer-events:none;z-index:0;background:radial-gradient(ellipse at center,rgba(0,240,200,0.055) 0%,transparent 65%);}
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Barlow', sans-serif;
-  min-height: 100vh;
-  max-width: 480px;
-  margin: 0 auto;
-  overflow-x: hidden;
-}
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(6,8,16,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+.hdr-inner{display:flex;align-items:center;gap:12px;max-width:500px;margin:0 auto;padding:0 14px;height:52px;}
+.logo{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:22px;letter-spacing:3px;text-transform:uppercase;color:var(--txt);flex-shrink:0;}
+.logo em{color:var(--teal);font-style:normal;text-shadow:0 0 16px var(--teal);}
+.hdr-mid{flex:1;}
+.xp-bar-wrap{display:flex;align-items:center;gap:8px;}
+.level-badge{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a0f00;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11px;letter-spacing:1px;padding:2px 7px;border-radius:4px;flex-shrink:0;}
+.xp-track{flex:1;height:5px;background:rgba(255,255,255,0.06);border-radius:5px;overflow:hidden;}
+.xp-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--teal3),var(--teal));border-radius:5px;box-shadow:0 0 8px var(--teal);transition:width 0.5s ease;}
+.xp-count{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;color:var(--teal);flex-shrink:0;white-space:nowrap;}
+.streak-pill{display:flex;align-items:center;gap:4px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.22);border-radius:6px;padding:3px 8px;flex-shrink:0;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:var(--gold);}
 
-body::before {
-  content:'';
-  position:fixed;inset:0;
-  background:
-    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(0,230,118,0.07) 0%, transparent 60%),
-    repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(255,255,255,0.008) 40px,rgba(255,255,255,0.008) 41px);
-  pointer-events:none;z-index:0;
-}
+/* LOGIN SCREEN */
+.login-screen{position:fixed;inset:0;z-index:200;background:var(--bg0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:32px;}
+.login-logo{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:48px;letter-spacing:6px;text-transform:uppercase;}
+.login-logo em{color:var(--teal);font-style:normal;text-shadow:0 0 30px var(--teal);}
+.login-sub{font-size:14px;color:var(--txt2);text-align:center;line-height:1.6;}
+.login-btn{display:flex;align-items:center;gap:12px;background:white;color:#1a1a1a;padding:14px 28px;border-radius:10px;border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:16px;letter-spacing:1px;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 20px rgba(0,0,0,0.4);}
+.login-btn:active{transform:scale(0.97);}
+.login-btn svg{width:20px;height:20px;}
+.login-skip{font-size:12px;color:var(--txt3);cursor:pointer;text-decoration:underline;margin-top:8px;}
+.login-skip:active{color:var(--txt2);}
 
-/* ─── HEADER ─── */
-.header {
-  position: sticky; top:0; z-index:100;
-  background: rgba(7,8,13,0.96);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  padding: 14px 18px;
-  display: flex; align-items: center; justify-content: space-between;
-}
+/* PAGES */
+.page{display:none;position:relative;z-index:1;}
+.page.active{display:block;}
 
-.logo {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 26px; letter-spacing:.08em; line-height:1;
-}
-.logo span { color: var(--green); }
+/* LEAGUE BAR */
+.league-bar{display:flex;gap:6px;padding:10px 14px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border2);background:var(--bg1);}
+.league-bar::-webkit-scrollbar{display:none}
+.ltab{flex-shrink:0;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--txt2);padding:5px 14px;border-radius:4px;cursor:pointer;border:1px solid transparent;transition:all .2s;}
+.ltab.active{background:var(--teal-dim);border-color:var(--teal3);color:var(--teal);}
+.ltab:active{transform:scale(0.96);}
 
-.user-pill {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--card2); border: 1px solid var(--border);
-  padding: 6px 12px; cursor:pointer;
-}
-.user-pill .tier { color: var(--gold); font-size:13px; }
-.user-pill .uname {
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:13px; font-weight:700; letter-spacing:.05em;
-}
+.home-wrap{max-width:500px;margin:0 auto;padding:0 0 80px;}
 
-/* ─── MATCH BAR ─── */
-.match-bar {
-  position: sticky; top:57px; z-index:90;
-  background: rgba(7,8,13,0.96);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 18px;
-  display: flex; align-items: center; justify-content: space-between;
-}
+/* SECTION HEAD */
+.sec-head{display:flex;align-items:center;justify-content:space-between;padding:18px 14px 10px;}
+.sec-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);display:flex;align-items:center;gap:8px;}
+.sec-title::before{content:'';width:3px;height:14px;background:var(--teal);border-radius:2px;display:inline-block;}
+.sec-link{font-family:'Rajdhani',sans-serif;font-size:12px;color:var(--teal);font-weight:600;letter-spacing:0.5px;cursor:pointer;}
 
-.match-teams {
-  font-family:'Bebas Neue',sans-serif;
-  font-size:22px; letter-spacing:.04em;
-  display:flex; align-items:center; gap:10px;
-}
+/* FIFA CARDS */
+.cards-scroll{display:flex;gap:10px;padding:0 14px 4px;overflow-x:auto;scrollbar-width:none;}
+.cards-scroll::-webkit-scrollbar{display:none}
+.fifa-card{flex-shrink:0;width:145px;border-radius:10px;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,0.06);position:relative;transition:transform .2s,box-shadow .2s;animation:fadeUp .5s ease both;}
+.fifa-card:active{transform:scale(0.97);}
+.fifa-card.gold{background:linear-gradient(160deg,#2a1f05 0%,#1a1200 40%,#2d2010 100%);border-color:rgba(245,200,66,0.3);box-shadow:0 4px 24px rgba(245,200,66,0.1);}
+.fifa-card.teal{background:linear-gradient(160deg,#052220 0%,#021510 40%,#062e28 100%);border-color:rgba(0,240,200,0.25);box-shadow:0 4px 24px rgba(0,240,200,0.08);}
+.fifa-card.blue{background:linear-gradient(160deg,#071828 0%,#040f1a 40%,#0a1e30 100%);border-color:rgba(77,168,255,0.2);}
+.fifa-card.silver{background:linear-gradient(160deg,#1a1f26 0%,#0f1318 40%,#1c222a 100%);border-color:rgba(158,184,200,0.2);}
+.card-top{padding:10px 10px 0;display:flex;justify-content:space-between;align-items:flex-start;}
+.card-rating{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:32px;line-height:1;}
+.fifa-card.gold .card-rating{color:var(--gold);}
+.fifa-card.teal .card-rating{color:var(--teal);}
+.fifa-card.blue .card-rating{color:var(--blue);}
+.fifa-card.silver .card-rating{color:var(--silver);}
+.card-left-info{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+.card-pos{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;}
+.fifa-card.gold .card-pos{color:var(--gold);}
+.fifa-card.teal .card-pos{color:var(--teal);}
+.fifa-card.blue .card-pos{color:var(--blue);}
+.fifa-card.silver .card-pos{color:var(--silver);}
+.card-img-wrap{display:flex;justify-content:center;align-items:center;height:90px;position:relative;overflow:hidden;}
+.card-img-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,rgba(0,0,0,0.5));}
+.card-avatar{font-size:58px;user-select:none;line-height:1;}
+.card-name{text-align:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;padding:0 8px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fifa-card.gold .card-name{color:var(--gold);}
+.fifa-card.teal .card-name{color:var(--teal);}
+.fifa-card.blue .card-name{color:var(--blue);}
+.fifa-card.silver .card-name{color:var(--silver);}
+.card-divider{height:1px;margin:0 8px;}
+.fifa-card.gold .card-divider{background:rgba(245,200,66,0.2);}
+.fifa-card.teal .card-divider{background:rgba(0,240,200,0.15);}
+.fifa-card.blue .card-divider{background:rgba(77,168,255,0.15);}
+.fifa-card.silver .card-divider{background:rgba(158,184,200,0.12);}
+.card-stats{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:6px 10px 10px;}
+.cs{display:flex;flex-direction:column;align-items:center;}
+.cs-val{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;line-height:1;}
+.cs-lbl{font-size:9px;letter-spacing:0.5px;font-weight:600;}
+.fifa-card.gold .cs-val{color:var(--gold);} .fifa-card.gold .cs-lbl{color:rgba(245,200,66,0.5);}
+.fifa-card.teal .cs-val{color:var(--teal);} .fifa-card.teal .cs-lbl{color:rgba(0,240,200,0.4);}
+.fifa-card.blue .cs-val{color:var(--blue);} .fifa-card.blue .cs-lbl{color:rgba(77,168,255,0.4);}
+.fifa-card.silver .cs-val,.fifa-card.silver .cs-lbl{color:var(--silver);opacity:.7;}
+.card-locked-overlay{position:absolute;inset:0;background:rgba(6,8,16,0.75);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:10px;}
+.lock-votes{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:11px;color:var(--txt3);letter-spacing:0.5px;}
+.lock-mini-bar{width:50px;height:3px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+.lock-mini-fill{height:100%;background:var(--teal3);border-radius:3px;}
 
-.score-box {
-  background: var(--card2);
-  border: 1px solid var(--green);
-  color: var(--green);
-  font-family:'Bebas Neue',sans-serif;
-  font-size:20px; padding:3px 12px;
-}
+/* RANKING */
+.rank-list{display:flex;flex-direction:column;gap:6px;padding:0 14px;}
+.rank-row{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;cursor:pointer;transition:border-color .2s,transform .2s;animation:fadeUp .4s ease both;}
+.rank-row:active{transform:scale(0.98);border-color:var(--teal3);}
+.rank-n{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;width:24px;text-align:center;flex-shrink:0;}
+.rank-n.g{color:var(--gold);} .rank-n.s{color:var(--silver);} .rank-n.b{color:#a0785a;} .rank-n.o{color:var(--txt3);}
+.rank-av{width:40px;height:40px;flex-shrink:0;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--bg3);}
+.rank-info{flex:1;min-width:0;}
+.rank-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0.5px;}
+.rank-sub{font-size:11px;color:var(--txt3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rank-score{flex-shrink:0;text-align:right;}
+.rank-val{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:24px;color:var(--teal);line-height:1;}
+.rank-votes{font-size:10px;color:var(--txt3);margin-top:2px;}
 
-.live-dot {
-  display:flex; align-items:center; gap:5px;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:11px; color:var(--green); letter-spacing:.1em;
-}
-.live-dot::before {
-  content:'';width:6px;height:6px;background:var(--green);border-radius:50%;
-  animation: blink 1.4s infinite;
-}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+/* H2H */
+.h2h-wrap{margin:0 14px;}
+.h2h-card{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;overflow:hidden;}
+.h2h-top{padding:10px 14px;background:linear-gradient(90deg,rgba(0,240,200,0.06),transparent);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px;}
+.h2h-tag{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:10px;letter-spacing:2px;color:var(--teal);border:1px solid var(--teal3);border-radius:3px;padding:2px 7px;}
+.h2h-q{font-size:12px;color:var(--txt2);}
+.h2h-arena{display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;padding:16px 14px;}
+.h2h-p{text-align:center;}
+.h2h-av{width:64px;height:64px;margin:0 auto 8px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;}
+.h2h-av.a{background:radial-gradient(circle,rgba(0,240,200,0.12),transparent);border:1px solid rgba(0,240,200,0.25);}
+.h2h-av.b{background:radial-gradient(circle,rgba(255,61,87,0.12),transparent);border:1px solid rgba(255,61,87,0.25);}
+.h2h-pname{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.5px;}
+.h2h-pteam{font-size:11px;color:var(--txt3);margin-top:1px;}
+.h2h-vs{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:22px;color:var(--txt3);letter-spacing:2px;text-align:center;}
+.h2h-actions{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border2);}
+.h2h-btn{padding:13px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.5px;text-align:center;transition:background .15s;user-select:none;}
+.h2h-btn:first-child{color:var(--teal);border-right:1px solid var(--border2);border-bottom-left-radius:10px;}
+.h2h-btn:last-child{color:var(--red);border-bottom-right-radius:10px;}
+.h2h-btn:active{background:var(--bg3);}
 
-/* ─── TABS ─── */
-.tabs {
-  display:flex; border-bottom:1px solid var(--border);
-  position:sticky; top:117px; z-index:80;
-  background:rgba(7,8,13,0.96); backdrop-filter:blur(12px);
-}
-.tab {
-  flex:1; padding:12px 8px; text-align:center;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
-  color:var(--muted); cursor:pointer;
-  border-bottom:3px solid transparent; transition:all .2s;
-}
-.tab.active{color:var(--green);border-bottom-color:var(--green);}
+/* PLAYER DETAIL */
+.detail-page{max-width:500px;margin:0 auto;padding:0 0 90px;}
+.detail-back{display:flex;align-items:center;gap:8px;padding:12px 14px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;color:var(--txt2);letter-spacing:1px;border-bottom:1px solid var(--border2);}
+.detail-back:active{color:var(--teal);}
+.big-card-wrap{padding:16px 14px 0;}
+.big-card{border-radius:14px;overflow:hidden;position:relative;border:1px solid rgba(245,200,66,0.25);background:linear-gradient(160deg,#2d2008 0%,#120e02 50%,#1e1604 100%);box-shadow:0 12px 40px rgba(245,200,66,0.08),inset 0 1px 0 rgba(245,200,66,0.15);}
+.big-rating{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:52px;color:var(--gold);line-height:1;text-shadow:0 0 30px rgba(245,200,66,0.4);}
+.big-pos{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;color:var(--gold);opacity:0.7;}
+.big-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;}
+.big-team{font-size:12px;color:rgba(245,200,66,0.5);margin-bottom:10px;letter-spacing:0.5px;}
+.big-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.bst{display:flex;align-items:center;gap:5px;}
+.bst-val{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;color:var(--gold);width:26px;}
+.bst-lbl{font-size:10px;color:rgba(245,200,66,0.4);letter-spacing:0.5px;}
+.fm-stats-section{padding:14px;}
+.fm-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--txt3);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.fm-title::after{content:'';flex:1;height:1px;background:var(--border2);}
+.fm-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.fm-lbl{font-size:12px;font-weight:600;color:var(--txt2);width:88px;flex-shrink:0;}
+.fm-bar{flex:1;height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;}
+.fm-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(0.16,1,0.3,1);}
+.fm-fill.hi{background:linear-gradient(90deg,#00a88c,var(--teal));}
+.fm-fill.mid{background:linear-gradient(90deg,#c49a10,var(--gold));}
+.fm-fill.lo{background:linear-gradient(90deg,#a02030,var(--red));}
+.fm-fill.locked{background:rgba(255,255,255,0.05);width:100%!important;}
+.fm-num{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;color:var(--teal);width:28px;text-align:right;}
+.fm-num.locked{color:var(--txt3);}
+.radar-wrap{padding:0 14px 14px;display:flex;justify-content:center;}
+.radar-svg{width:200px;height:200px;}
 
-/* ─── VIEWS ─── */
-.view{display:none; position:relative; z-index:1;}
-.view.active{display:block;}
+/* VOTE PANEL */
+.vote-panel{margin:0 14px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;overflow:hidden;}
+.vote-panel-head{padding:10px 14px;background:rgba(0,240,200,0.04);border-bottom:1px solid var(--border2);font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11px;letter-spacing:2px;color:var(--txt2);}
+.vote-panel-body{padding:14px;}
+.vtabs{display:flex;gap:6px;margin-bottom:14px;}
+.vtab{flex:1;padding:7px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--txt2);text-align:center;transition:all .2s;}
+.vtab.active{background:var(--teal-dim);border-color:var(--teal3);color:var(--teal);}
+.slider-big{width:100%;-webkit-appearance:none;appearance:none;height:5px;border-radius:5px;background:rgba(255,255,255,0.07);outline:none;cursor:pointer;}
+.slider-big::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--teal);box-shadow:0 0 14px var(--teal-glow);border:2px solid var(--bg0);cursor:pointer;}
+.slider-val-big{text-align:center;margin-bottom:12px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:52px;color:var(--teal);line-height:1;text-shadow:0 0 40px var(--teal-glow);}
+.slider-ends{display:flex;justify-content:space-between;font-size:10px;color:var(--txt3);margin-top:5px;margin-bottom:14px;letter-spacing:0.5px;}
+.vote-submit{width:100%;padding:13px;background:linear-gradient(90deg,var(--teal3),var(--teal));border:none;border-radius:8px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--bg0);cursor:pointer;box-shadow:0 4px 18px var(--teal-glow);transition:transform .15s,box-shadow .15s;}
+.vote-submit:active{transform:scale(0.98);}
+.unlock-progress-wrap{background:rgba(0,0,0,0.2);border-radius:6px;padding:10px 12px;margin-bottom:14px;border:1px solid var(--border2);}
+.unlock-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.unlock-hd-txt{font-size:11px;color:var(--txt2);}
+.unlock-hd-num{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:12px;color:var(--teal);}
+.unlock-bar{height:4px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;}
+.unlock-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--teal3),var(--teal));transition:width 0.5s ease;}
+.stars-row{display:flex;justify-content:center;gap:10px;margin-bottom:16px;}
+.star-btn{font-size:30px;cursor:pointer;transition:transform .15s;filter:grayscale(1) brightness(0.3);}
+.star-btn.on{filter:none;transform:scale(1.1);}
 
-/* ─── SECTION LABEL ─── */
-.sec-label {
-  padding:18px 18px 10px;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase;
-  color:var(--muted); display:flex; align-items:center; gap:10px;
-}
-.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,8,16,0.96);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0);}
+.bnav-inner{display:flex;justify-content:space-around;max-width:500px;margin:0 auto;padding:6px 0;}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 14px;cursor:pointer;border-radius:8px;transition:all .2s;position:relative;}
+.ni.active .ni-ico{color:var(--teal);}
+.ni.active .ni-lbl{color:var(--teal);}
+.ni.active::before{content:'';position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:28px;height:2px;background:var(--teal);box-shadow:0 0 8px var(--teal);border-radius:0 0 4px 4px;}
+.ni-ico{font-size:20px;color:var(--txt3);transition:color .2s;}
+.ni-lbl{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:10px;letter-spacing:1px;color:var(--txt3);transition:color .2s;}
 
-/* ─── MY SCOUT CARD ─── */
-.scout-card {
-  margin:16px 16px 0;
-  background: linear-gradient(135deg, #0d1a14 0%, var(--card) 100%);
-  border:1px solid rgba(0,230,118,0.25);
-  padding:16px;
-  display:flex; align-items:center; gap:16px;
-}
-.scout-avatar {
-  width:52px;height:52px;border-radius:50%;
-  background:linear-gradient(135deg,#1a2e1a,#0d1a14);
-  border:2px solid var(--green);
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;flex-shrink:0;
-}
-.scout-info{flex:1;}
-.scout-name{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:18px;font-weight:900;letter-spacing:.02em;
-}
-.scout-meta{font-size:11px;color:var(--muted);margin-top:2px;}
-.scout-stats{
-  display:flex;gap:16px;margin-top:10px;
-}
-.scout-stat{text-align:center;}
-.scout-stat-val{
-  font-family:'Bebas Neue',sans-serif;font-size:22px;
-  line-height:1;color:var(--green);
-}
-.scout-stat-lbl{font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+/* PROFILE */
+.profile-wrap{max-width:500px;margin:0 auto;padding:0 14px 90px;}
+.profile-hero{display:flex;flex-direction:column;align-items:center;padding:28px 0 20px;gap:10px;}
+.profile-av{width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,var(--teal-dim),var(--bg3));border:2px solid var(--teal3);display:flex;align-items:center;justify-content:center;font-size:44px;overflow:hidden;}
+.profile-av img{width:100%;height:100%;object-fit:cover;}
+.profile-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:22px;letter-spacing:1px;}
+.profile-level{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,rgba(245,200,66,0.08),transparent);border:1px solid rgba(245,200,66,0.15);border-radius:6px;padding:4px 12px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:var(--gold);letter-spacing:1px;}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;width:100%;}
+.pstat{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:12px;text-align:center;}
+.pstat-val{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:22px;color:var(--teal);}
+.pstat-lbl{font-size:10px;color:var(--txt3);letter-spacing:0.5px;margin-top:2px;}
+.logout-btn{width:100%;margin-top:16px;padding:12px;background:transparent;border:1px solid var(--red);border-radius:8px;color:var(--red);font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;cursor:pointer;transition:background 0.2s;}
+.logout-btn:active{background:rgba(255,61,87,0.1);}
 
-/* ─── PROGRESS ─── */
-.progress-bar-wrap{
-  margin:16px 16px 0;
-  background:var(--card);border:1px solid var(--border);
-  padding:14px;
-}
-.prog-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-.prog-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.1em;color:var(--muted);}
-.prog-count{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--green);}
-.prog-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
-.prog-fill{height:100%;background:var(--green);border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1);}
+/* TOAST */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--teal);color:var(--bg0);font-family:'Rajdhani',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;padding:13px 28px;border-radius:10px;z-index:500;pointer-events:none;animation:toastAnim 1.4s ease forwards;}
+@keyframes toastAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(0.8);}15%{opacity:1;transform:translate(-50%,-50%) scale(1);}70%{opacity:1;transform:translate(-50%,-55%) scale(1);}100%{opacity:0;transform:translate(-50%,-65%) scale(0.95);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 
-/* ─── PLAYER CARD ─── */
-.player-card {
-  margin:12px 16px 0;
-  background:var(--card);
-  border:1px solid var(--border);
-  overflow:hidden;
-  transition:border-color .25s;
-  animation:slideUp .4s ease both;
-}
-.player-card.voted{border-color:rgba(0,230,118,0.4);}
-.player-card:nth-child(1){animation-delay:.05s}
-.player-card:nth-child(2){animation-delay:.1s}
-.player-card:nth-child(3){animation-delay:.15s}
-.player-card:nth-child(4){animation-delay:.2s}
-.player-card:nth-child(5){animation-delay:.25s}
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;gap:10px;color:var(--txt2);font-family:'Rajdhani',sans-serif;font-size:14px;letter-spacing:1px;}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
-@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-
-.card-top{display:flex;align-items:center;padding:14px 14px 10px;gap:12px;}
-
-.jersey-num{
-  font-family:'Bebas Neue',sans-serif;font-size:32px;
-  color:var(--border);min-width:32px;text-align:center;line-height:1;
-}
-
-.avatar{
-  width:50px;height:50px;border-radius:50%;
-  background:linear-gradient(135deg,#141a28,#0d1018);
-  border:2px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;flex-shrink:0;position:relative;
-}
-
-.pos-chip{
-  position:absolute;bottom:-2px;right:-2px;
-  background:var(--green);color:#000;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:8px;font-weight:900;padding:1px 4px;letter-spacing:.05em;
-}
-
-.p-info{flex:1;min-width:0;}
-.p-name{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:17px;font-weight:900;letter-spacing:.02em;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.p-sub{font-size:10px;color:var(--muted);letter-spacing:.05em;margin-top:2px;}
-
-.rating-col{text-align:center;min-width:52px;}
-.rating-num{
-  font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;
-  transition:color .3s;
-}
-.rating-lbl{font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
-
-/* bar */
-.bar-row{padding:0 14px 10px;display:flex;align-items:center;gap:8px;}
-.bar-votes{font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;min-width:60px;}
-.bar-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
-.bar-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1),background .3s;}
-
-/* TAGS */
-.tags-row{
-  display:flex;gap:6px;padding:0 14px 12px;flex-wrap:wrap;
-}
-.tag{
-  font-size:9px;font-family:'Barlow Condensed',sans-serif;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;
-  padding:3px 8px;border:1px solid var(--border);
-  color:var(--muted);cursor:pointer;transition:all .2s;
-}
-.tag:hover,.tag.active{
-  background:rgba(0,230,118,0.12);border-color:var(--green);color:var(--green);
-}
-.tag .tag-count{opacity:.5;margin-left:4px;}
-
-/* RATING SLIDER SECTION */
-.rate-section{padding:8px 14px 14px;}
-.rate-title{
-  font-size:9px;color:var(--muted);letter-spacing:.15em;
-  text-transform:uppercase;margin-bottom:10px;
-}
-
-.slider-wrap{position:relative;margin-bottom:8px;}
-input[type=range]{
-  width:100%;height:6px;
-  -webkit-appearance:none;appearance:none;
-  background:var(--border);border-radius:3px;cursor:pointer;
-  outline:none;
-}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  width:22px;height:22px;border-radius:50%;
-  background:var(--green);border:3px solid var(--bg);
-  cursor:pointer;transition:transform .15s;
-}
-input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2);}
-
-.slider-labels{
-  display:flex;justify-content:space-between;
-  font-size:9px;color:var(--muted);letter-spacing:.05em;margin-top:4px;
-}
-
-.slider-val-row{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:10px;
-}
-.slider-current{
-  font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1;
-  transition:color .2s;
-}
-.slider-desc{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:13px;font-weight:700;letter-spacing:.05em;
-  text-align:right;max-width:140px;
-}
-
-.submit-btn{
-  width:100%;padding:13px;
-  background:var(--green);color:#000;border:none;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:15px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;
-  cursor:pointer;transition:opacity .2s;
-}
-.submit-btn:active{opacity:.8;}
-
-/* VOTED STATE */
-.voted-state{
-  display:none;padding:10px 14px 14px;
-  background:rgba(0,230,118,0.04);
-  border-top:1px solid var(--border);
-}
-.player-card.voted .rate-section{display:none;}
-.player-card.voted .voted-state{display:block;}
-
-.voted-row{
-  display:flex;align-items:center;gap:12px;margin-bottom:10px;
-}
-.my-vote-label{
-  font-size:10px;color:var(--muted);letter-spacing:.1em;
-  font-family:'Barlow Condensed',sans-serif;
-}
-.my-vote-num{
-  font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--gold);line-height:1;
-}
-.my-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
-.my-tag{
-  font-size:9px;padding:3px 8px;
-  background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);
-  color:var(--green);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.08em;
-}
-
-.share-row{display:flex;gap:8px;}
-.share-btn{
-  flex:1;padding:10px;border:1px solid var(--green);
-  background:none;color:var(--green);
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:12px;font-weight:700;letter-spacing:.1em;
-  cursor:pointer;transition:all .2s;
-}
-.share-btn:active{background:var(--green);color:#000;}
-.change-btn{
-  padding:10px 16px;border:1px solid var(--border);
-  background:none;color:var(--muted);
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:12px;font-weight:700;letter-spacing:.08em;cursor:pointer;
-}
-
-/* ─── MOM SECTION ─── */
-.mom-wrap{
-  margin:16px 16px 0;
-  background:linear-gradient(135deg,#14100a 0%,var(--card) 100%);
-  border:1px solid rgba(255,215,0,0.25);
-  padding:20px;text-align:center;position:relative;overflow:hidden;
-}
-.mom-wrap::before{
-  content:'🏆';position:absolute;
-  font-size:100px;opacity:.04;
-  top:50%;left:50%;transform:translate(-50%,-50%);
-}
-.mom-label{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:11px;font-weight:700;letter-spacing:.3em;
-  color:var(--gold);margin-bottom:10px;text-transform:uppercase;
-}
-.mom-name{
-  font-family:'Bebas Neue',sans-serif;font-size:38px;
-  letter-spacing:.04em;line-height:1;margin-bottom:4px;
-}
-.mom-score{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:16px;font-weight:700;color:var(--green);margin-bottom:14px;
-}
-.mom-share{
-  width:100%;padding:13px;background:var(--gold);color:#000;border:none;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:14px;font-weight:900;letter-spacing:.15em;cursor:pointer;transition:opacity .2s;
-}
-.mom-share:active{opacity:.8;}
-
-/* ─── LEADERBOARD ─── */
-.lb-row{
-  display:flex;align-items:center;
-  padding:13px 18px;border-bottom:1px solid var(--border);
-  gap:12px;transition:background .15s;
-}
-.lb-row:active{background:var(--card);}
-.lb-rank{
-  font-family:'Bebas Neue',sans-serif;font-size:22px;min-width:28px;text-align:center;
-}
-.lb-rank.r1{color:#FFD700;}
-.lb-rank.r2{color:#C0C0C0;}
-.lb-rank.r3{color:#CD7F32;}
-.lb-info{flex:1;min-width:0;}
-.lb-name{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:17px;font-weight:900;letter-spacing:.02em;
-}
-.lb-sub{font-size:10px;color:var(--muted);margin-top:1px;}
-.lb-score{
-  font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1;text-align:right;
-}
-.lb-mini-bar{width:70px;margin-top:3px;}
-.lb-mini-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
-.lb-mini-fill{height:100%;border-radius:2px;background:var(--green);}
-
-/* ─── SCOUT LEADERBOARD ─── */
-.scout-row{
-  display:flex;align-items:center;
-  padding:13px 18px;border-bottom:1px solid var(--border);gap:12px;
-}
-.scout-tier-badge{
-  font-size:16px;min-width:32px;text-align:center;
-}
-.scout-row-info{flex:1;}
-.scout-row-name{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:17px;font-weight:900;letter-spacing:.02em;
-}
-.scout-row-meta{font-size:10px;color:var(--muted);}
-.scout-acc{
-  font-family:'Bebas Neue',sans-serif;font-size:26px;
-  line-height:1;color:var(--green);text-align:right;
-}
-.scout-acc-lbl{font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;}
-
-/* ─── BOTTOM NAV ─── */
-.bottom-nav{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:480px;
-  background:rgba(7,8,13,0.97);
-  border-top:1px solid var(--border);
-  display:flex;z-index:200;backdrop-filter:blur(16px);
-  padding-bottom:env(safe-area-inset-bottom);
-}
-.nav-btn{
-  flex:1;padding:12px 8px 10px;text-align:center;
-  cursor:pointer;border:none;background:none;
-  color:var(--muted);transition:color .2s;
-}
-.nav-btn.active{color:var(--green);}
-.nav-icon{font-size:19px;line-height:1;margin-bottom:3px;}
-.nav-lbl{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:10px;letter-spacing:.1em;text-transform:uppercase;display:block;
-}
-
-/* ─── TOAST ─── */
-.toast{
-  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(10px);
-  background:var(--card2);border:1px solid var(--green);color:var(--green);
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;
-  font-size:13px;letter-spacing:.08em;
-  padding:11px 22px;opacity:0;transition:all .3s;
-  pointer-events:none;z-index:999;white-space:nowrap;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-.spacer{height:80px;}
-
-/* ─── LEAGUE SELECTOR ─── */
-.league-bar{
-  display:flex;gap:0;overflow-x:auto;
-  border-bottom:1px solid var(--border);
-  background:rgba(7,8,13,0.96);
-  backdrop-filter:blur(12px);
-  scrollbar-width:none;
-  position:sticky;top:117px;z-index:75;
-}
-.league-bar::-webkit-scrollbar{display:none;}
-.league-tab{
-  flex-shrink:0;padding:10px 14px;
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:11px;font-weight:700;letter-spacing:.08em;
-  color:var(--muted);cursor:pointer;
-  border-bottom:2px solid transparent;
-  transition:all .2s;white-space:nowrap;
-  display:flex;align-items:center;gap:6px;
-}
-.league-tab.active{color:var(--green);border-bottom-color:var(--green);}
-.league-tab .l-flag{font-size:14px;}
-.league-tab .l-badge{
-  font-size:8px;background:rgba(0,230,118,0.15);
-  color:var(--green);border:1px solid rgba(0,230,118,0.3);
-  padding:1px 4px;font-weight:900;
-}
-
-/* ─── SCOUT DUEL ─── */
-.duel-card{
-  margin:12px 16px 0;
-  background:linear-gradient(135deg,#0d0a1a,var(--card));
-  border:1px solid rgba(179,136,255,0.3);
-  padding:18px;position:relative;overflow:hidden;
-}
-.duel-card::before{
-  content:'⚔️';position:absolute;
-  font-size:80px;opacity:.04;
-  top:50%;right:-10px;transform:translateY(-50%);
-}
-.duel-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:14px;
-}
-.duel-title{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:11px;font-weight:700;letter-spacing:.2em;
-  color:var(--purple);text-transform:uppercase;
-}
-.duel-live{
-  font-size:9px;color:var(--green);
-  font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.15em;
-  display:flex;align-items:center;gap:5px;
-}
-.duel-live::before{content:'';width:5px;height:5px;background:var(--green);border-radius:50%;animation:blink 1.4s infinite;}
-
-.duel-vs{
-  display:flex;align-items:center;gap:10px;
-  margin-bottom:14px;
-}
-.duel-scout{
-  flex:1;text-align:center;
-  background:var(--card2);border:1px solid var(--border);
-  padding:10px;
-}
-.duel-scout-tier{font-size:16px;margin-bottom:4px;}
-.duel-scout-name{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:14px;font-weight:900;letter-spacing:.02em;
-  margin-bottom:2px;
-}
-.duel-scout-acc{font-size:10px;color:var(--muted);}
-.duel-vs-label{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:24px;color:var(--purple);
-  flex-shrink:0;
-}
-.duel-score{
-  display:flex;justify-content:space-between;
-  margin-bottom:12px;
-}
-.duel-score-val{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:32px;line-height:1;
-}
-.duel-progress{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px;}
-.duel-progress-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--green),var(--purple));transition:width .8s ease;}
-.duel-accept{
-  width:100%;padding:12px;
-  background:rgba(179,136,255,0.1);
-  border:1px solid rgba(179,136,255,0.4);
-  color:var(--purple);
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:13px;font-weight:900;letter-spacing:.12em;
-  cursor:pointer;transition:all .2s;
-}
-.duel-accept:active{background:var(--purple);color:#000;}
-
-/* ─── U21 BADGE ─── */
-.u21-badge{
-  display:inline-block;
-  font-size:8px;font-family:'Barlow Condensed',sans-serif;font-weight:900;
-  letter-spacing:.1em;padding:2px 5px;
-  background:rgba(255,145,0,0.15);
-  color:var(--orange);border:1px solid rgba(255,145,0,0.4);
-  margin-left:6px;vertical-align:middle;
-}
-
-/* ─── FANTASY SCOUT ─── */
-.fantasy-wrap{padding:16px;}
-.fantasy-header{
-  background:linear-gradient(135deg,#14100a,var(--card));
-  border:1px solid rgba(255,215,0,0.2);
-  padding:18px;margin-bottom:12px;
-}
-.fantasy-title{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:22px;letter-spacing:.04em;color:var(--gold);
-  margin-bottom:4px;
-}
-.fantasy-sub{font-size:11px;color:var(--muted);margin-bottom:14px;}
-.fantasy-points{
-  display:flex;gap:16px;
-}
-.fp-stat{text-align:center;}
-.fp-val{
-  font-family:'Bebas Neue',sans-serif;font-size:28px;
-  line-height:1;color:var(--gold);
-}
-.fp-lbl{font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
-
-.fantasy-team{display:flex;flex-direction:column;gap:8px;}
-.fantasy-slot{
-  background:var(--card);border:1px solid var(--border);
-  padding:12px 14px;
-  display:flex;align-items:center;gap:12px;
-  cursor:pointer;transition:border-color .2s;
-}
-.fantasy-slot:hover{border-color:var(--gold);}
-.fantasy-slot.filled{border-color:rgba(255,215,0,0.3);}
-.fs-pos{
-  font-family:'Bebas Neue',sans-serif;font-size:13px;
-  color:var(--muted);min-width:30px;
-}
-.fs-avatar{
-  width:36px;height:36px;border-radius:50%;
-  background:var(--card2);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;flex-shrink:0;
-}
-.fs-info{flex:1;}
-.fs-name{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:15px;font-weight:900;
-}
-.fs-pts{
-  font-family:'Bebas Neue',sans-serif;font-size:22px;
-  color:var(--gold);
-}
-.fs-pts-lbl{font-size:9px;color:var(--muted);}
-.fantasy-empty{
-  color:var(--muted);font-size:11px;
-  text-align:center;font-family:'Barlow Condensed',sans-serif;
-  letter-spacing:.08em;
-}
-
-/* ─── LEAGUE BANNER ─── */
-.league-banner{
-  margin:0 16px 0;
-  padding:12px 16px;
-  background:var(--card);border:1px solid var(--border);
-  display:flex;align-items:center;gap:12px;
-  border-left:3px solid var(--green);
-}
-.lb-flag{font-size:24px;}
-.lb-info{flex:1;}
-.lb-name{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:16px;font-weight:900;letter-spacing:.03em;
-}
-.lb-season{font-size:10px;color:var(--muted);}
-.lb-round{
-  font-family:'Bebas Neue',sans-serif;font-size:13px;
-  color:var(--green);
-}
-
-/* Rating colors */
-.rc-elite{color:#00e676}
-.rc-great{color:#76ff03}
-.rc-good{color:#FFD700}
-.rc-avg{color:#ff9800}
-.rc-poor{color:#ff3d57}
-
-/* ─── PROFILE OVERLAY ─── */
-.profile-overlay{
-  position:fixed;inset:0;z-index:500;
-  background:var(--bg);
-  transform:translateX(100%);
-  transition:transform .35s cubic-bezier(.4,0,.2,1);
-  overflow-y:auto;
-  max-width:480px;
-  left:50%;margin-left:-240px;
-}
-@media(max-width:480px){.profile-overlay{left:0;margin-left:0;}}
-.profile-overlay.open{transform:translateX(0);}
-
-.prof-header{
-  position:sticky;top:0;z-index:10;
-  background:rgba(7,8,13,0.96);backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--border);
-  padding:14px 18px;
-  display:flex;align-items:center;gap:14px;
-}
-.prof-back{
-  background:none;border:1px solid var(--border);
-  color:var(--text);padding:6px 12px;cursor:pointer;
-  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
-  letter-spacing:.08em;transition:all .2s;
-}
-.prof-back:active{background:var(--border);}
-.prof-title{
-  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.05em;flex:1;
-}
-
-/* Hero */
-.prof-hero{
-  padding:24px 20px 16px;
-  display:flex;align-items:center;gap:18px;
-  border-bottom:1px solid var(--border);
-  background:linear-gradient(180deg,rgba(0,230,118,0.06) 0%,transparent 100%);
-}
-.prof-avatar{
-  width:80px;height:80px;border-radius:50%;
-  background:linear-gradient(135deg,#1a2e1a,#0d1a14);
-  border:3px solid var(--green);
-  display:flex;align-items:center;justify-content:center;
-  font-size:36px;flex-shrink:0;
-}
-.prof-meta{flex:1;}
-.prof-name{
-  font-family:'Bebas Neue',sans-serif;font-size:34px;
-  letter-spacing:.04em;line-height:1;
-}
-.prof-sub{font-size:12px;color:var(--muted);letter-spacing:.06em;margin-top:4px;}
-.prof-badges{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
-.prof-badge{
-  font-size:9px;font-family:'Barlow Condensed',sans-serif;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;
-  padding:3px 9px;border:1px solid var(--green);color:var(--green);
-}
-.prof-score-col{text-align:center;}
-.prof-score-big{
-  font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;
-}
-.prof-score-lbl{font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;}
-
-/* Stats row */
-.prof-stats{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  border-bottom:1px solid var(--border);
-}
-.prof-stat{
-  padding:14px 10px;text-align:center;
-  border-right:1px solid var(--border);
-}
-.prof-stat:last-child{border-right:none;}
-.prof-stat-val{
-  font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--green);line-height:1;
-}
-.prof-stat-lbl{font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
-
-/* Salary */
-.salary-card{
-  margin:16px;
-  background:linear-gradient(135deg,#14100a,var(--card));
-  border:1px solid rgba(255,215,0,0.2);
-  padding:16px;display:flex;align-items:center;gap:16px;
-}
-.salary-icon{font-size:32px;}
-.salary-info{flex:1;}
-.salary-label{font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px;}
-.salary-amount{
-  font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--gold);line-height:1;
-}
-.salary-per{font-size:11px;color:var(--muted);margin-top:2px;}
-.salary-market{
-  text-align:right;
-}
-.salary-market-val{
-  font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text);
-}
-.salary-market-lbl{font-size:9px;color:var(--muted);letter-spacing:.08em;}
-
-/* Polygon radar */
-.radar-wrap{
-  margin:0 16px 16px;
-  background:var(--card);border:1px solid var(--border);
-  padding:16px;
-}
-.radar-title{
-  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
-  margin-bottom:14px;display:flex;align-items:center;gap:8px;
-}
-.radar-title::after{content:'';flex:1;height:1px;background:var(--border);}
-.radar-svg-wrap{display:flex;justify-content:center;margin-bottom:14px;}
-.radar-legend{
-  display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;
-}
-.radar-leg-item{
-  display:flex;align-items:center;justify-content:space-between;
-  font-size:11px;
-}
-.radar-leg-name{color:var(--muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:.05em;}
-.radar-leg-val{
-  font-family:'Bebas Neue',sans-serif;font-size:16px;
-}
-
-/* Monthly chart */
-.chart-wrap{
-  margin:0 16px 16px;
-  background:var(--card);border:1px solid var(--border);
-  padding:16px;
-}
-.chart-title{
-  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
-  margin-bottom:16px;display:flex;align-items:center;gap:8px;
-}
-.chart-title::after{content:'';flex:1;height:1px;background:var(--border);}
-.chart-svg-wrap{width:100%;overflow:hidden;}
-
-/* Career timeline */
-.career-wrap{margin:0 16px 16px;}
-.career-title{
-  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
-  margin-bottom:12px;display:flex;align-items:center;gap:8px;
-}
-.career-title::after{content:'';flex:1;height:1px;background:var(--border);}
-
-.career-item{
-  display:flex;gap:14px;margin-bottom:0;
-  position:relative;
-}
-.career-line{
-  display:flex;flex-direction:column;align-items:center;
-}
-.career-dot{
-  width:12px;height:12px;border-radius:50%;
-  background:var(--border);border:2px solid var(--green);
-  flex-shrink:0;margin-top:4px;
-}
-.career-dot.current{background:var(--green);}
-.career-connector{
-  width:2px;flex:1;background:var(--border);
-  margin:4px 0;min-height:20px;
-}
-.career-content{
-  flex:1;padding-bottom:20px;
-}
-.career-club{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:16px;font-weight:900;letter-spacing:.02em;
-}
-.career-years{font-size:10px;color:var(--muted);margin-top:1px;}
-.career-apps{
-  display:flex;gap:12px;margin-top:6px;
-}
-.career-app-stat{
-  font-size:10px;color:var(--muted);
-}
-.career-app-stat span{
-  font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--text);margin-right:2px;
-}
-.career-flag{font-size:14px;}
+/* QUEST */
+.quest{margin:12px 14px 0;background:linear-gradient(110deg,var(--bg3),var(--bg2));border:1px solid rgba(0,240,200,0.18);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .2s;}
+.quest:active{transform:scale(0.98);}
+.quest-ico{width:40px;height:40px;flex-shrink:0;background:var(--teal-dim);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.quest-body{flex:1;}
+.quest-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--teal);margin-bottom:2px;}
+.quest-desc{font-size:12px;color:var(--txt2);line-height:1.4;}
+.quest-reward{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:20px;color:var(--gold);text-align:center;flex-shrink:0;}
+.quest-reward span{display:block;font-size:10px;color:var(--txt3);font-weight:400;}
 </style>
 </head>
 <body>
+<div class="ambient"></div>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-logo">FAN<em>SCORE</em></div>
+  <div class="login-sub">Αξιολόγησε τους παίκτες του<br>Ελληνικού ποδοσφαίρου</div>
+  <button class="login-btn" onclick="loginWithGoogle()">
+    <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    ΣΥΝΔΕΣΗ ΜΕ GOOGLE
+  </button>
+  <div class="login-skip" onclick="skipLogin()">Συνέχεια χωρίς σύνδεση (περιορισμένη πρόσβαση)</div>
+</div>
 
 <!-- HEADER -->
-<div class="header">
-  <div class="logo">Fan<span>Score</span> <span style="font-size:13px;color:var(--muted);letter-spacing:.05em">BALKAN</span></div>
-  <div class="user-pill" onclick="showToast('👤 Το προφίλ σου έρχεται σύντομα!')">
-    <span class="tier">⭐⭐</span>
-    <span class="uname">@scout_gr</span>
+<div class="hdr" id="mainHeader" style="display:none;">
+  <div class="hdr-inner">
+    <div class="logo">FAN<em>SCORE</em></div>
+    <div class="hdr-mid">
+      <div class="xp-bar-wrap">
+        <div class="level-badge" id="levelBadge">BRONZE</div>
+        <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+        <div class="xp-count" id="xpCount">0 XP</div>
+      </div>
+    </div>
+    <div class="streak-pill">🔥<span id="streakN">0</span></div>
   </div>
 </div>
 
-<!-- MATCH BAR -->
-<div class="match-bar">
-  <div class="match-teams">
-    <span>ΠΑΟ</span>
-    <div class="score-box">2–1</div>
-    <span>ΑΕΚ</span>
+<!-- PAGE: HOME -->
+<div class="page" id="page-home">
+  <div class="home-wrap">
+    <div class="league-bar">
+      <div class="ltab active" onclick="selLeague(this,'Super League')">Α' ΕΘΝΙΚΗ</div>
+      <div class="ltab" onclick="selLeague(this,'Super League 2')">Β' ΕΘΝΙΚΗ</div>
+      <div class="ltab" style="opacity:.35;pointer-events:none;">Γ' ΕΘΝΙΚΗ</div>
+    </div>
+
+    <div class="quest" onclick="showToast('🎯 Quest ενεργοποιήθηκε!')">
+      <div class="quest-ico">🎯</div>
+      <div class="quest-body">
+        <div class="quest-label">DAILY QUEST</div>
+        <div class="quest-desc">Βαθμολόγησε 5 παίκτες σήμερα</div>
+      </div>
+      <div class="quest-reward">+20<span>XP</span></div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-title">HOT RIGHT NOW</div>
+      <div class="sec-link" onclick="gotoPage('page-players')">ΟΛΑ →</div>
+    </div>
+    <div class="cards-scroll" id="hotCards">
+      <div class="loading"><div class="spinner"></div>ΦΟΡΤΩΣΗ...</div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-title">TOP RANKING</div>
+      <div class="sec-link" onclick="gotoPage('page-players')">ΠΛΗΡΕΣ →</div>
+    </div>
+    <div class="rank-list" id="rankList">
+      <div class="loading"><div class="spinner"></div>ΦΟΡΤΩΣΗ...</div>
+    </div>
   </div>
-  <div class="live-dot">LIVE VOTING</div>
 </div>
 
-<!-- LEAGUE SELECTOR -->
-<div class="league-bar" id="leagueBar">
-  <div class="league-tab active" onclick="switchLeague('gr','Αγ.24 · ΠΑΟ vs ΑΕΚ','2–1',this)">
-    <span class="l-flag">🇬🇷</span> Super League
-  </div>
-  <div class="league-tab" onclick="switchLeague('gr21','Αγ.18 · ΠΑΟ U21 vs ΑΕΚ U21','1–0',this)">
-    <span class="l-flag">🇬🇷</span> U21 <span class="l-badge">HOT</span>
-  </div>
-  <div class="league-tab" onclick="switchLeague('rs','Αγ.22 · Red Star vs Partizan','2–2',this)">
-    <span class="l-flag">🇷🇸</span> Superliga
-  </div>
-  <div class="league-tab" onclick="switchLeague('bg','Αγ.20 · Ludogorets vs CSKA','3–0',this)">
-    <span class="l-flag">🇧🇬</span> First League
-  </div>
-  <div class="league-tab" onclick="switchLeague('cy','Αγ.19 · APOEL vs Omonia','1–1',this)">
-    <span class="l-flag">🇨🇾</span> 1η Κατηγορία
-  </div>
-  <div class="league-tab" onclick="switchLeague('hr','Αγ.21 · Dinamo vs Hajduk','2–0',this)">
-    <span class="l-flag">🇭🇷</span> HNL
+<!-- PAGE: PLAYERS -->
+<div class="page" id="page-players">
+  <div class="home-wrap">
+    <div class="league-bar">
+      <div class="ltab active">Α' ΕΘΝΙΚΗ</div>
+    </div>
+    <div class="rank-list" id="allPlayersList" style="padding-top:12px;">
+      <div class="loading"><div class="spinner"></div>ΦΟΡΤΩΣΗ...</div>
+    </div>
   </div>
 </div>
 
-<!-- TABS -->
-<div class="tabs">
-  <div class="tab active" onclick="switchView('vote')">⚽ Ψήφισε</div>
-  <div class="tab" onclick="switchView('board')">📊 Παίκτες</div>
-  <div class="tab" onclick="switchView('duels')">⚔️ Duels</div>
-  <div class="tab" onclick="switchView('fantasy')">🏆 Fantasy</div>
-  <div class="tab" onclick="switchView('scouts')">🎯 Scouts</div>
+<!-- PAGE: H2H -->
+<div class="page" id="page-h2h">
+  <div class="home-wrap">
+    <div style="padding:14px;" id="h2hContent">
+      <div class="loading"><div class="spinner"></div>ΦΟΡΤΩΣΗ...</div>
+    </div>
+  </div>
 </div>
 
-<!-- ════════════ VOTE VIEW ════════════ -->
-<div class="view active" id="voteView">
-
-  <!-- My Scout Card -->
-  <div class="scout-card">
-    <div class="scout-avatar">🧠</div>
-    <div class="scout-info">
-      <div class="scout-name">@scout_gr <span style="color:var(--gold)">⭐⭐</span></div>
-      <div class="scout-meta">Tier 2 Expert · 70%+ Ακρίβεια</div>
-      <div class="scout-stats">
-        <div class="scout-stat">
-          <div class="scout-stat-val" id="myRatingCount">0</div>
-          <div class="scout-stat-lbl">Ψήφοι</div>
+<!-- PAGE: PLAYER DETAIL -->
+<div class="page" id="page-player">
+  <div class="detail-page">
+    <div class="detail-back" onclick="gotoPage(prevPage)">← ΠΙΣΩ</div>
+    <div class="big-card-wrap">
+      <div class="big-card">
+        <div style="display:grid;grid-template-columns:90px 1fr;">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 0 16px 16px;gap:4px;">
+            <div class="big-rating" id="d-rating">—</div>
+            <div class="big-pos" id="d-pos">—</div>
+          </div>
+          <div style="display:flex;flex-direction:column;justify-content:center;padding:14px 16px 14px 0;">
+            <div class="big-name" id="d-name">—</div>
+            <div class="big-team" id="d-team">—</div>
+            <div class="big-stats-grid" id="d-stats-grid"></div>
+          </div>
         </div>
-        <div class="scout-stat">
-          <div class="scout-stat-val" id="myAccuracy">—</div>
-          <div class="scout-stat-lbl">Ακρίβεια</div>
-        </div>
-        <div class="scout-stat">
-          <div class="scout-stat-val">1.2x</div>
-          <div class="scout-stat-lbl">Βάρος</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Progress -->
-  <div class="progress-bar-wrap">
-    <div class="prog-row">
-      <span class="prog-label">ΒΑΘΜΟΛΟΓΗΣΕΣ</span>
-      <span class="prog-count" id="progText">0 / 11</span>
-    </div>
-    <div class="prog-track">
-      <div class="prog-fill" id="progFill" style="width:0%"></div>
-    </div>
-  </div>
-
-  <!-- MOM -->
-  <div class="mom-wrap">
-    <div class="mom-label">★ Man of the Match ★</div>
-    <div class="mom-name" id="momName">—</div>
-    <div class="mom-score" id="momScore">Ψήφισε παίκτες για να δεις</div>
-    <button class="mom-share" onclick="shareAll()">📤 ΜΟΙΡΑΣΟΥ ΤΟ ΑΠΟΤΕΛΕΣΜΑ</button>
-  </div>
-
-  <!-- PAO Players -->
-  <div class="sec-label">ΠΑΟ — Ενδεκάδα</div>
-  <div id="teamA"></div>
-
-  <!-- AEK Players -->
-  <div class="sec-label">ΑΕΚ — Ενδεκάδα</div>
-  <div id="teamB"></div>
-
-  <div class="spacer"></div>
-</div>
-
-<!-- ════════════ DUELS VIEW ════════════ -->
-<div class="view" id="duelsView">
-  <div style="height:12px"></div>
-
-  <!-- Active Duel -->
-  <div class="duel-card">
-    <div class="duel-header">
-      <div class="duel-title">⚔️ Scout Duel — Ενεργό</div>
-      <div class="duel-live">LIVE</div>
-    </div>
-    <div class="duel-vs">
-      <div class="duel-scout">
-        <div class="duel-scout-tier">⭐⭐⭐⭐</div>
-        <div class="duel-scout-name">@pao_analyst</div>
-        <div class="duel-scout-acc">87% ακρίβεια</div>
-      </div>
-      <div class="duel-vs-label">VS</div>
-      <div class="duel-scout">
-        <div class="duel-scout-tier">⭐⭐</div>
-        <div class="duel-scout-name">@scout_gr</div>
-        <div class="duel-scout-acc">74% ακρίβεια</div>
-      </div>
-    </div>
-    <div class="duel-score">
-      <div class="duel-score-val" style="color:var(--green)">6</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--muted);align-self:center">ΠΑΙΚΤΕΣ ΚΟΙΝΟΙ</div>
-      <div class="duel-score-val" style="color:var(--purple)">4</div>
-    </div>
-    <div class="duel-progress"><div class="duel-progress-fill" style="width:60%"></div></div>
-    <div style="font-size:10px;color:var(--muted);text-align:center;margin-bottom:12px;font-family:'Barlow Condensed',sans-serif;">
-      Ποιος θα είναι πιο accurate στον αγώνα; Αποτέλεσμα σε 90'
-    </div>
-    <button class="duel-accept" onclick="showToast('⚔️ Βρίσκουμε αντίπαλο...')">📤 ΜΟΙΡΑΣΟΥ ΤΟ DUEL</button>
-  </div>
-
-  <!-- Challenge section -->
-  <div class="sec-label" style="margin-top:16px">Προκάλεσε Scout</div>
-
-  <div id="duelChallengeList"></div>
-
-  <!-- My duel stats -->
-  <div class="sec-label" style="margin-top:8px">Τα Duels μου</div>
-  <div style="margin:0 16px;background:var(--card);border:1px solid var(--border);padding:16px;">
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;">
-      <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--green)">12</div>
-        <div style="font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;">Νίκες</div>
-      </div>
-      <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--red)">5</div>
-        <div style="font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;">Ήττες</div>
-      </div>
-      <div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold)">71%</div>
-        <div style="font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;">Win Rate</div>
-      </div>
-    </div>
-  </div>
-
-  <div style="height:80px"></div>
-</div>
-
-<!-- ════════════ FANTASY VIEW ════════════ -->
-<div class="view" id="fantasyView">
-  <div class="fantasy-wrap">
-
-    <div class="fantasy-header">
-      <div class="fantasy-title">🏆 Fantasy Scout League</div>
-      <div class="fantasy-sub">Διάλεξε 5 παίκτες. Κερδίζεις points αν αποδίδουν καλά στην πραγματικότητα.</div>
-      <div class="fantasy-points">
-        <div class="fp-stat">
-          <div class="fp-val" id="fantasyPts">247</div>
-          <div class="fp-lbl">Points</div>
-        </div>
-        <div class="fp-stat">
-          <div class="fp-val" style="color:var(--green)">3ος</div>
-          <div class="fp-lbl">Κατάταξη</div>
-        </div>
-        <div class="fp-stat">
-          <div class="fp-val">Εβδ.4</div>
-          <div class="fp-lbl">Αγωνιστική</div>
+        <div style="display:flex;justify-content:center;padding-bottom:12px;">
+          <div style="font-size:70px;" id="d-avatar">⚽</div>
         </div>
       </div>
     </div>
-
-    <div class="sec-label">Η Ομάδα μου</div>
-    <div class="fantasy-team" id="fantasyTeam"></div>
-
-    <div style="margin-top:12px;">
-      <button onclick="showToast('📤 Κοινοποίηση Fantasy Team!')" style="width:100%;padding:13px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:.12em;cursor:pointer;">
-        📤 ΜΟΙΡΑΣΟΥ ΤΗΝ ΟΜΑΔΑ ΣΟΥ
-      </button>
+    <div class="radar-wrap" style="padding-top:14px;">
+      <svg class="radar-svg" viewBox="0 0 200 200" id="radarSvg"></svg>
     </div>
-
-    <div class="sec-label" style="margin-top:16px">Εβδομαδιαίο Leaderboard</div>
-    <div id="fantasyLb"></div>
-
+    <div class="fm-stats-section">
+      <div class="fm-title">ΣΤΑΤΙΣΤΙΚΑ</div>
+      <div id="fm-rows"></div>
+    </div>
+    <div class="vote-panel">
+      <div class="vote-panel-head">ΑΞΙΟΛΟΓΗΣΕ ΤΟΝ ΠΑΙΚΤΗ</div>
+      <div class="vote-panel-body">
+        <div id="unlockBarWrap" class="unlock-progress-wrap" style="display:none">
+          <div class="unlock-hd">
+            <div class="unlock-hd-txt">🔒 Ψήφισε για να ξεκλειδώσεις τα stats</div>
+            <div class="unlock-hd-num" id="unlockNums">0/20</div>
+          </div>
+          <div class="unlock-bar"><div class="unlock-fill" id="unlockFill" style="width:0%"></div></div>
+        </div>
+        <div class="vtabs">
+          <div class="vtab active" onclick="setVtab(this,'vt-slider')">1–100</div>
+          <div class="vtab" onclick="setVtab(this,'vt-stars')">⭐ ΑΣΤΕΡΙΑ</div>
+        </div>
+        <div id="vt-slider">
+          <div class="slider-val-big" id="svBig">72</div>
+          <input type="range" class="slider-big" min="1" max="100" value="72" oninput="document.getElementById('svBig').textContent=this.value"/>
+          <div class="slider-ends"><span>1 — Αδύναμος</span><span>100 — Θεός</span></div>
+          <br/>
+          <button class="vote-submit" onclick="submitVote()">⚡ ΨΗΦΙΣΕ — +5 XP</button>
+        </div>
+        <div id="vt-stars" style="display:none">
+          <div class="stars-row" id="starsRow">
+            <div class="star-btn on" onclick="setStar(1)">⭐</div>
+            <div class="star-btn on" onclick="setStar(2)">⭐</div>
+            <div class="star-btn on" onclick="setStar(3)">⭐</div>
+            <div class="star-btn on" onclick="setStar(4)">⭐</div>
+            <div class="star-btn" onclick="setStar(5)">⭐</div>
+          </div>
+          <button class="vote-submit" onclick="submitVote()">⚡ ΨΗΦΙΣΕ — +5 XP</button>
+        </div>
+      </div>
+    </div>
   </div>
-  <div style="height:80px"></div>
 </div>
 
-<!-- ════════════ LEADERBOARD VIEW ════════════ -->
-<div class="view" id="boardView">
-  <div class="sec-label">Κατάταξη Παικτών</div>
-  <div id="lbList"></div>
-  <div class="spacer"></div>
-</div>
-
-<!-- ════════════ SCOUTS VIEW ════════════ -->
-<div class="view" id="scoutsView">
-  <div class="sec-label">Top Scouts — Κατάταξη</div>
-  <div id="scoutList"></div>
-  <div class="spacer"></div>
-</div>
-
-<!-- ════════════ PLAYER PROFILE OVERLAY ════════════ -->
-<div class="profile-overlay" id="profileOverlay">
-
-  <div class="prof-header">
-    <button class="prof-back" onclick="closeProfile()">← ΠΙΣΩ</button>
-    <div class="prof-title" id="profTitle">Προφίλ Παίκτη</div>
-  </div>
-
-  <div class="prof-hero">
-    <div class="prof-avatar" id="profAvatar">⚡</div>
-    <div class="prof-meta">
-      <div class="prof-name" id="profName">—</div>
-      <div class="prof-sub" id="profSub">—</div>
-      <div class="prof-badges" id="profBadges"></div>
+<!-- PAGE: PROFILE -->
+<div class="page" id="page-profile">
+  <div class="profile-wrap">
+    <div class="profile-hero">
+      <div class="profile-av" id="profileAv">😎</div>
+      <div class="profile-name" id="profileName">—</div>
+      <div class="profile-level" id="profileLevel">🥉 BRONZE SCOUT</div>
+      <div class="profile-stats">
+        <div class="pstat"><div class="pstat-val" id="pXP">0</div><div class="pstat-lbl">XP</div></div>
+        <div class="pstat"><div class="pstat-val" id="pVotes">0</div><div class="pstat-lbl">ΨΗΦΟΙ</div></div>
+        <div class="pstat"><div class="pstat-val" id="pStreak">🔥0</div><div class="pstat-lbl">STREAK</div></div>
+      </div>
     </div>
-    <div class="prof-score-col">
-      <div class="prof-score-big" id="profScore">—</div>
-      <div class="prof-score-lbl">FanScore<br>/20</div>
-    </div>
+    <button class="logout-btn" onclick="logout()">ΑΠΟΣΥΝΔΕΣΗ</button>
   </div>
-
-  <div class="prof-stats">
-    <div class="prof-stat"><div class="prof-stat-val" id="profAge">—</div><div class="prof-stat-lbl">Ηλικία</div></div>
-    <div class="prof-stat"><div class="prof-stat-val" id="profApps">—</div><div class="prof-stat-lbl">Εμφ. φέτος</div></div>
-    <div class="prof-stat"><div class="prof-stat-val" id="profGoals">—</div><div class="prof-stat-lbl">Γκολ/Ασίστ</div></div>
-    <div class="prof-stat"><div class="prof-stat-val" id="profVotes">—</div><div class="prof-stat-lbl">Ψήφοι</div></div>
-  </div>
-
-  <div class="salary-card">
-    <div class="salary-icon">💰</div>
-    <div class="salary-info">
-      <div class="salary-label">Εβδομαδιαίος Μισθός</div>
-      <div class="salary-amount" id="profSalaryW">—</div>
-      <div class="salary-per" id="profSalaryY">— ετησίως</div>
-    </div>
-    <div class="salary-market">
-      <div class="salary-market-val" id="profMarketVal">—</div>
-      <div class="salary-market-lbl">Market Value</div>
-    </div>
-  </div>
-
-  <div class="radar-wrap">
-    <div class="radar-title">Αξιολόγηση Ικανοτήτων</div>
-    <div class="radar-svg-wrap">
-      <svg id="radarSVG" width="220" height="220" viewBox="0 0 220 220"></svg>
-    </div>
-    <div class="radar-legend" id="radarLegend"></div>
-  </div>
-
-  <div class="chart-wrap">
-    <div class="chart-title">Μηνιαία Βαθμολογία 2025–26</div>
-    <div class="chart-svg-wrap">
-      <svg id="chartSVG" width="100%" height="140" viewBox="0 0 340 140" preserveAspectRatio="xMidYMid meet"></svg>
-    </div>
-  </div>
-
-  <div class="career-wrap">
-    <div class="career-title">Καριέρα</div>
-    <div id="careerList"></div>
-  </div>
-
-  <div style="height:30px"></div>
 </div>
 
 <!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <button class="nav-btn active" onclick="switchView('vote')" id="nav-vote">
-    <div class="nav-icon">⚽</div><span class="nav-lbl">Ψήφισε</span>
-  </button>
-  <button class="nav-btn" onclick="switchView('board')" id="nav-board">
-    <div class="nav-icon">📊</div><span class="nav-lbl">Παίκτες</span>
-  </button>
-  <button class="nav-btn" onclick="switchView('duels')" id="nav-duels">
-    <div class="nav-icon">⚔️</div><span class="nav-lbl">Duels</span>
-  </button>
-  <button class="nav-btn" onclick="switchView('fantasy')" id="nav-fantasy">
-    <div class="nav-icon">🏆</div><span class="nav-lbl">Fantasy</span>
-  </button>
-  <button class="nav-btn" onclick="shareAll()" id="nav-share">
-    <div class="nav-icon">📤</div><span class="nav-lbl">Share</span>
-  </button>
+<div class="bnav" id="mainNav" style="display:none;">
+  <div class="bnav-inner">
+    <div class="ni active" onclick="navClick(this,'page-home')"><div class="ni-ico">🏠</div><div class="ni-lbl">HOME</div></div>
+    <div class="ni" onclick="navClick(this,'page-players')"><div class="ni-ico">⚽</div><div class="ni-lbl">ΠΑΙΚΤΕΣ</div></div>
+    <div class="ni" onclick="navClick(this,'page-h2h')"><div class="ni-ico">⚔️</div><div class="ni-lbl">H2H</div></div>
+    <div class="ni" onclick="navClick(this,'page-profile')"><div class="ni-ico">👤</div><div class="ni-lbl">PROFILE</div></div>
+  </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
-// ─── DATA ───
-const TAGS = ['Playmaker','Leader','Clutch','Dribbler','Warrior','Clinical','Engine'];
+// ═══════════════════════════════════════
+// SUPABASE INIT
+// ═══════════════════════════════════════
+const SUPABASE_URL = 'https://xszsyiqvznozidbhoowg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzenN5aXF2em5vemlkYmhvb3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0OTgyMDksImV4cCI6MjA4NzA3NDIwOX0.U1neuI7trgykYMTeuSkTE83gx_BZBs1ydU32wIen_nY';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const players = [
-  {id:1,name:'Dragowski',pos:'GK',num:1,team:'ΠΑΟ',emoji:'🧤',seed:14},
-  {id:2,name:'Μπακασέτας',pos:'MC',num:10,team:'ΠΑΟ',emoji:'⚡',seed:15},
-  {id:3,name:'Λούσεγου',pos:'FW',num:9,team:'ΠΑΟ',emoji:'🔥',seed:13},
-  {id:4,name:'Χουάν',pos:'MF',num:8,team:'ΠΑΟ',emoji:'⚙️',seed:12},
-  {id:5,name:'Σένγκε',pos:'DF',num:4,team:'ΠΑΟ',emoji:'🛡️',seed:11},
-  {id:6,name:'Έρικσεν',pos:'DF',num:5,team:'ΠΑΟ',emoji:'🛡️',seed:10},
-  {id:7,name:'Μαρκόβιτς',pos:'GK',num:1,team:'ΑΕΚ',emoji:'🧤',seed:13},
-  {id:8,name:'Τσούμα',pos:'FW',num:11,team:'ΑΕΚ',emoji:'🔥',seed:16},
-  {id:9,name:'Γκαρσία',pos:'MF',num:6,team:'ΑΕΚ',emoji:'⚡',seed:14},
-  {id:10,name:'Σβάρνας',pos:'DF',num:3,team:'ΑΕΚ',emoji:'🛡️',seed:12},
-  {id:11,name:'Στόχ',pos:'FW',num:7,team:'ΑΕΚ',emoji:'🔥',seed:11},
-];
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let currentUser = null;
+let currentProfile = null;
+let currentPlayer = null;
+let prevPage = 'page-home';
+let allPlayers = [];
+let selectedStars = 4;
 
-// Community votes (simulated)
-const communityVotes = {};
-players.forEach(p => {
-  communityVotes[p.id] = {
-    count: Math.floor(Math.random()*600)+80,
-    avg: (p.seed + (Math.random()*2-1)).toFixed(1)*1
-  };
-});
+const AVATARS = ['⚽','🧑🏽','🧑🏻','🧑🏼','🧔🏻','🧑🏾','🧑🏿','👨🏻','👨🏽','👨🏾'];
+const CARD_TYPES = ['gold','teal','blue','silver'];
 
-const topScouts = [
-  {name:'@pao_analyst',tier:'⭐⭐⭐⭐',ratings:312,accuracy:87,spec:'Greek MC Specialist'},
-  {name:'@scout_north',tier:'⭐⭐⭐',ratings:145,accuracy:82,spec:'Defender Expert'},
-  {name:'@football_iq',tier:'⭐⭐⭐',ratings:118,accuracy:81,spec:'GK Specialist'},
-  {name:'@scout_gr',tier:'⭐⭐',ratings:67,accuracy:74,spec:'All-rounder'},
-  {name:'@fanatic_aek',tier:'⭐⭐',ratings:54,accuracy:71,spec:'FW Expert'},
-  {name:'@nikos_pao',tier:'⭐',ratings:23,accuracy:52,spec:'Newbie'},
-  {name:'@random123',tier:'⭐',ratings:8,accuracy:38,spec:'Newbie'},
-];
-
-// My votes
-const myVotes = {}; // {playerId: {rating, tags}}
-let sliderVals = {}; // live slider values
-
-// ─── RATING HELPERS ───
-function ratingColor(r){
-  if(r>=17) return '#00e676';
-  if(r>=14) return '#76ff03';
-  if(r>=11) return '#FFD700';
-  if(r>=8)  return '#ff9800';
-  return '#ff3d57';
-}
-function ratingDesc(r){
-  if(r>=18) return '🌟 Κορυφαία Επίδοση';
-  if(r>=16) return '🔥 Εξαιρετικός';
-  if(r>=14) return '✅ Πολύ Καλός';
-  if(r>=12) return '👍 Καλός';
-  if(r>=10) return '😐 Μέτριος';
-  if(r>=7)  return '👎 Κακός';
-  return '💩 Άθλιος';
-}
-
-// ─── RENDER PLAYERS ───
-function renderPlayers(){
-  const paoEl = document.getElementById('teamA');
-  const aekEl = document.getElementById('teamB');
-  paoEl.innerHTML = '';
-  aekEl.innerHTML = '';
-  players.filter(p=>p.team==='ΠΑΟ').forEach(p=>{ paoEl.innerHTML += buildCard(p); });
-  players.filter(p=>p.team==='ΑΕΚ').forEach(p=>{ aekEl.innerHTML += buildCard(p); });
-}
-
-function buildCard(p){
-  const v = myVotes[p.id];
-  const voted = !!v;
-  const cv = communityVotes[p.id];
-  const displayRating = voted ? ((cv.avg*cv.count + v.rating)/(cv.count+1)).toFixed(1)*1 : cv.avg;
-  const color = ratingColor(displayRating);
-  const pct = (displayRating/20*100).toFixed(1);
-  const slider = sliderVals[p.id] || 10;
-
-  return `
-  <div class="player-card ${voted?'voted':''}" id="card-${p.id}">
-    <div class="card-top">
-      <div class="jersey-num">${p.num}</div>
-      <div class="avatar">
-        ${p.emoji}
-        <div class="pos-chip">${p.pos}</div>
-      </div>
-      <div class="p-info" onclick="openProfile(${p.id})" style="cursor:pointer">
-        <div class="p-name" style="text-decoration:underline;text-decoration-color:rgba(0,230,118,0.4)">${p.name} ›</div>
-        <div class="p-sub">${p.team} · ${p.pos}</div>
-      </div>
-      <div class="rating-col">
-        <div class="rating-num" style="color:${color}" id="rnum-${p.id}">${displayRating.toFixed(1)}</div>
-        <div class="rating-lbl">/20</div>
-      </div>
-    </div>
-
-    <div class="bar-row">
-      <div class="bar-votes" id="bvotes-${p.id}">${(cv.count+(voted?1:0)).toLocaleString()} ψήφοι</div>
-      <div class="bar-track">
-        <div class="bar-fill" id="bfill-${p.id}" style="width:${pct}%;background:${color}"></div>
-      </div>
-    </div>
-
-    <div class="tags-row" id="tags-${p.id}">
-      ${TAGS.map(t=>{
-        const cnt = Math.floor(Math.random()*80+5);
-        const active = voted && v.tags && v.tags.includes(t);
-        return `<span class="tag ${active?'active':''}" onclick="toggleTag(${p.id},'${t}',this)">${t}<span class="tag-count">${cnt}</span></span>`;
-      }).join('')}
-    </div>
-
-    <!-- RATE SECTION (pre-vote) -->
-    <div class="rate-section" id="rateSection-${p.id}">
-      <div class="rate-title">ΔΩΣ ΤΗ ΒΑΘΜΟΛΟΓΙΑ ΣΟΥ (1–20)</div>
-      <div class="slider-val-row">
-        <div class="slider-current" id="sval-${p.id}" style="color:${ratingColor(slider)}">${slider}</div>
-        <div class="slider-desc" id="sdesc-${p.id}" style="color:${ratingColor(slider)}">${ratingDesc(slider)}</div>
-      </div>
-      <div class="slider-wrap">
-        <input type="range" min="1" max="20" value="${slider}"
-          oninput="onSlider(${p.id},this.value)"
-          id="slider-${p.id}">
-      </div>
-      <div class="slider-labels">
-        <span>1 Άθλιος</span><span>5</span><span>10</span><span>15</span><span>20 Θρύλος</span>
-      </div>
-      <div style="height:12px"></div>
-      <button class="submit-btn" onclick="castVote(${p.id})">✅ ΥΠΟΒΟΛΗ ΒΑΘΜΟΛΟΓΙΑΣ</button>
-    </div>
-
-    <!-- VOTED STATE -->
-    <div class="voted-state" id="votedState-${p.id}">
-      <div class="voted-row">
-        <span class="my-vote-label">Η ΒΑΘΜΟΛΟΓΙΑ ΜΟΥ:</span>
-        <span class="my-vote-num" id="myvotenum-${p.id}">${voted?v.rating:''}/20</span>
-        <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:${voted?ratingColor(v.rating):'var(--muted)'}">
-          ${voted?ratingDesc(v.rating):''}
-        </span>
-      </div>
-      <div class="my-tags" id="myTags-${p.id}">
-        ${voted && v.tags ? v.tags.map(t=>`<span class="my-tag">${t}</span>`).join('') : ''}
-      </div>
-      <div class="share-row">
-        <button class="share-btn" onclick="sharePlayer(${p.id})">📤 ΜΟΙΡΑΣΟΥ</button>
-        <button class="change-btn" onclick="changeVote(${p.id})">✏️ ΑΛΛΑΓΗ</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-function onSlider(pid, val){
-  val = parseInt(val);
-  sliderVals[pid] = val;
-  const color = ratingColor(val);
-  const sv = document.getElementById(`sval-${pid}`);
-  const sd = document.getElementById(`sdesc-${pid}`);
-  if(sv){ sv.textContent = val; sv.style.color = color; }
-  if(sd){ sd.textContent = ratingDesc(val); sd.style.color = color; }
-}
-
-function toggleTag(pid, tag, el){
-  if(myVotes[pid]){
-    // After vote — update tags
-    if(!myVotes[pid].tags) myVotes[pid].tags = [];
-    const idx = myVotes[pid].tags.indexOf(tag);
-    if(idx>=0) myVotes[pid].tags.splice(idx,1);
-    else myVotes[pid].tags.push(tag);
-    el.classList.toggle('active');
-    updateMyTags(pid);
-  } else {
-    el.classList.toggle('active');
-  }
-}
-
-function updateMyTags(pid){
-  const el = document.getElementById(`myTags-${pid}`);
-  if(el && myVotes[pid] && myVotes[pid].tags){
-    el.innerHTML = myVotes[pid].tags.map(t=>`<span class="my-tag">${t}</span>`).join('');
-  }
-}
-
-function castVote(pid){
-  const slider = document.getElementById(`slider-${pid}`);
-  const rating = parseInt(slider ? slider.value : (sliderVals[pid]||10));
-  const activeTags = [];
-  document.querySelectorAll(`#tags-${pid} .tag.active`).forEach(t=>{
-    activeTags.push(t.textContent.replace(/[0-9]/g,'').trim());
+// ═══════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════
+async function loginWithGoogle() {
+  const { error } = await db.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin }
   });
-
-  myVotes[pid] = { rating, tags: activeTags };
-  sliderVals[pid] = rating;
-
-  // Update UI
-  const cv = communityVotes[pid];
-  const newAvg = ((cv.avg*cv.count + rating)/(cv.count+1));
-  const color = ratingColor(newAvg);
-
-  const rnumEl = document.getElementById(`rnum-${pid}`);
-  const bfillEl = document.getElementById(`bfill-${pid}`);
-  if(rnumEl){ rnumEl.textContent = newAvg.toFixed(1); rnumEl.style.color = color; }
-  if(bfillEl){ bfillEl.style.width = (newAvg/20*100)+'%'; bfillEl.style.background = color; }
-
-  const card = document.getElementById(`card-${pid}`);
-  if(card) card.classList.add('voted');
-
-  const mvn = document.getElementById(`myvotenum-${pid}`);
-  if(mvn) mvn.textContent = rating+'/20';
-
-  updateProgress();
-  updateMOM();
-  updateLeaderboard();
-  showToast(`✅ ${getPlayer(pid).name}: ${rating}/20 — ${ratingDesc(rating)}`);
+  if (error) showToast('❌ Σφάλμα σύνδεσης');
 }
 
-function changeVote(pid){
-  const card = document.getElementById(`card-${pid}`);
-  if(card) card.classList.remove('voted');
-  delete myVotes[pid];
-  // Re-render this card only
-  const p = getPlayer(pid);
-  const col = p.team==='ΠΑΟ'?'teamA':'teamB';
-  const container = document.getElementById(col);
-  const cards = container.querySelectorAll('.player-card');
-  const teamPlayers = players.filter(pl=>pl.team===p.team);
-  const idx = teamPlayers.findIndex(pl=>pl.id===pid);
-  if(cards[idx]) cards[idx].outerHTML = buildCard(p);
-  updateProgress();
-  updateMOM();
+async function skipLogin() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainHeader').style.display = 'block';
+  document.getElementById('mainNav').style.display = 'block';
+  showPage('page-home');
+  await loadPlayers();
 }
 
-function getPlayer(id){ return players.find(p=>p.id===id); }
-
-function updateProgress(){
-  const done = Object.keys(myVotes).length;
-  const total = players.length;
-  document.getElementById('progText').textContent = `${done} / ${total}`;
-  document.getElementById('progFill').style.width = (done/total*100)+'%';
-  document.getElementById('myRatingCount').textContent = done;
-  if(done>0){
-    const acc = Math.min(74+done*2, 94);
-    document.getElementById('myAccuracy').textContent = acc+'%';
-  }
+async function logout() {
+  await db.auth.signOut();
+  currentUser = null;
+  currentProfile = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('mainHeader').style.display = 'none';
+  document.getElementById('mainNav').style.display = 'none';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 }
 
-function updateMOM(){
-  const voted = players.filter(p=>myVotes[p.id]);
-  if(!voted.length) return;
-  const best = voted.reduce((a,b)=>myVotes[a.id].rating>myVotes[b.id].rating?a:b);
-  document.getElementById('momName').textContent = best.name;
-  document.getElementById('momScore').textContent = `⭐ ${myVotes[best.id].rating}/20 — ${best.team}`;
-}
-
-// ─── LEADERBOARD ───
-function updateLeaderboard(){
-  const all = [...players].map(p=>{
-    const cv = communityVotes[p.id];
-    const mv = myVotes[p.id];
-    const avg = mv ? ((cv.avg*cv.count+mv.rating)/(cv.count+1)) : cv.avg;
-    return {...p, displayAvg: avg, votes: cv.count+(mv?1:0)};
-  }).sort((a,b)=>b.displayAvg-a.displayAvg);
-
-  document.getElementById('lbList').innerHTML = all.map((p,i)=>{
-    const color = ratingColor(p.displayAvg);
-    const rankClass = i===0?'r1':i===1?'r2':i===2?'r3':'';
-    const rankEmoji = i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
-    return `
-    <div class="lb-row">
-      <div class="lb-rank ${rankClass}">${rankEmoji}</div>
-      <div class="lb-info">
-        <div class="lb-name">${p.name}</div>
-        <div class="lb-sub">${p.team} · ${p.pos} · ${p.votes.toLocaleString()} ψήφοι</div>
-      </div>
-      <div>
-        <div class="lb-score" style="color:${color}">${p.displayAvg.toFixed(1)}</div>
-        <div class="lb-mini-bar">
-          <div class="lb-mini-track">
-            <div class="lb-mini-fill" style="width:${p.displayAvg/20*100}%;background:${color}"></div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ─── SCOUT LB ───
-function renderScouts(){
-  document.getElementById('scoutList').innerHTML = topScouts.map((s,i)=>{
-    const rankEmoji = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
-    const accColor = s.accuracy>=80?'var(--green)':s.accuracy>=65?'var(--gold)':'var(--red)';
-    return `
-    <div class="scout-row">
-      <div class="scout-tier-badge">${rankEmoji||s.tier}</div>
-      <div class="scout-row-info">
-        <div class="scout-row-name">${s.name} ${s.tier}</div>
-        <div class="scout-row-meta">${s.ratings} ψήφοι · ${s.spec}</div>
-      </div>
-      <div style="text-align:right">
-        <div class="scout-acc" style="color:${accColor}">${s.accuracy}%</div>
-        <div class="scout-acc-lbl">Ακρίβεια</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ─── SHARE ───
-function sharePlayer(pid){
-  const p = getPlayer(pid);
-  const v = myVotes[pid];
-  const text = `⚽ ΠΑΟ 2–1 ΑΕΚ\n🎯 ${p.name} (${p.team}): ${v.rating}/20 — ${ratingDesc(v.rating)}\n${v.tags&&v.tags.length?'🏷️ '+v.tags.join(' · ')+'\n':''}📊 Βαθμολόγησε κι εσύ → fanscore.gr\n#FanScore #SuperLeague`;
-  if(navigator.share) navigator.share({title:'FanScore',text});
-  else navigator.clipboard.writeText(text).then(()=>showToast('📋 Αντιγράφηκε! Κόλλησέ το!'));
-}
-
-function shareAll(){
-  const done = Object.keys(myVotes).length;
-  if(!done){ showToast('⚠️ Ψήφισε πρώτα κάποιον παίκτη!'); return; }
-  const best = players.filter(p=>myVotes[p.id]).reduce((a,b)=>myVotes[a.id].rating>myVotes[b.id].rating?a:b);
-  const text = `⚽ ΠΑΟ 2–1 ΑΕΚ\n🏆 Man of the Match: ${best.name} — ${myVotes[best.id].rating}/20\n📊 Βαθμολόγησα ${done}/${players.length} παίκτες στο FanScore\n→ fanscore.gr #SuperLeague #FanScore`;
-  if(navigator.share) navigator.share({title:'FanScore MOM',text});
-  else navigator.clipboard.writeText(text).then(()=>showToast('📋 Αντιγράφηκε!'));
-}
-
-// ─── LEAGUE SWITCHER ───
-const leagues = {
-  gr: { name:'Super League', flag:'🇬🇷', match:'ΠΑΟ vs ΑΕΚ', score:'2–1', round:'Αγ. 24', u21:false },
-  gr21: { name:'Super League U21', flag:'🇬🇷', match:'ΠΑΟ U21 vs ΑΕΚ U21', score:'1–0', round:'Αγ. 18', u21:true },
-  rs: { name:'Superliga Σερβίας', flag:'🇷🇸', match:'Red Star vs Partizan', score:'2–2', round:'Αγ. 22', u21:false },
-  bg: { name:'First League Βουλγαρίας', flag:'🇧🇬', match:'Ludogorets vs CSKA Sofia', score:'3–0', round:'Αγ. 20', u21:false },
-  cy: { name:'1η Κατηγορία Κύπρου', flag:'🇨🇾', match:'APOEL vs Omonia', score:'1–1', round:'Αγ. 19', u21:false },
-  hr: { name:'HNL Κροατίας', flag:'🇭🇷', match:'Dinamo Zagreb vs Hajduk Split', score:'2–0', round:'Αγ. 21', u21:false },
-};
-
-let currentLeague = 'gr';
-
-function switchLeague(id, matchText, score, el){
-  currentLeague = id;
-  const lg = leagues[id];
-  document.querySelectorAll('.league-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-
-  // Update match bar
-  const parts = lg.match.split(' vs ');
-  document.querySelector('.match-teams').innerHTML = `
-    <span>${parts[0]}</span>
-    <div class="score-box">${lg.score}</div>
-    <span>${parts[1]}</span>
-  `;
-
-  // Add U21 badge if needed
-  const matchBar = document.querySelector('.match-bar');
-  const existingBadge = matchBar.querySelector('.u21-badge');
-  if(existingBadge) existingBadge.remove();
-  if(lg.u21){
-    const badge = document.createElement('span');
-    badge.className = 'u21-badge';
-    badge.textContent = 'U21';
-    document.querySelector('.match-teams').appendChild(badge);
+async function initAuth() {
+  const { data: { session } } = await db.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    await loadProfile();
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainHeader').style.display = 'block';
+    document.getElementById('mainNav').style.display = 'block';
+    showPage('page-home');
+    await loadPlayers();
   }
 
-  showToast(`${lg.flag} ${lg.name} — ${lg.round}`);
-  switchView('vote');
-}
-
-// ─── FANTASY DATA ───
-const fantasyPlayers = [
-  {name:'Μπακασέτας', team:'ΠΑΟ', pos:'MC', emoji:'⚡', pts:48, trend:'+8'},
-  {name:'Τσούμα', team:'ΑΕΚ', pos:'FW', emoji:'🔥', pts:52, trend:'+12'},
-  {name:'Dragowski', team:'ΠΑΟ', pos:'GK', emoji:'🧤', pts:31, trend:'+3'},
-  {name:'Γκαρσία', team:'ΑΕΚ', pos:'MF', emoji:'⚡', pts:39, trend:'+6'},
-  {name:'Λούσεγου', team:'ΠΑΟ', pos:'FW', emoji:'🔥', pts:44, trend:'+9'},
-];
-
-const fantasyLeaderboard = [
-  {name:'@pao_analyst', pts:312, team:'Μπακασέτας, Τσούμα, ...'},
-  {name:'@football_iq', pts:287, team:'Λούσεγου, Γκαρσία, ...'},
-  {name:'@scout_gr', pts:247, team:'Μπακασέτας, Τσούμα, ...'},
-  {name:'@fanatic_aek', pts:198, team:'Τσούμα, Σβάρνας, ...'},
-  {name:'@nikos_pao', pts:156, team:'Λούσεγου, Χουάν, ...'},
-];
-
-// ─── DUEL CHALLENGERS ───
-const duelOpponents = [
-  {name:'@football_iq', tier:'⭐⭐⭐', acc:'81%', spec:'GK Specialist'},
-  {name:'@fanatic_aek', tier:'⭐⭐', acc:'71%', spec:'FW Expert'},
-  {name:'@nikos_pao', tier:'⭐', acc:'52%', spec:'Newbie'},
-];
-
-function renderDuels(){
-  const el = document.getElementById('duelChallengeList');
-  if(!el) return;
-  el.innerHTML = duelOpponents.map(d=>`
-    <div style="margin:0 16px 8px;background:var(--card);border:1px solid var(--border);padding:14px;display:flex;align-items:center;gap:12px;">
-      <div style="font-size:20px">${d.tier}</div>
-      <div style="flex:1">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900">${d.name}</div>
-        <div style="font-size:10px;color:var(--muted)">${d.spec} · ${d.acc} accuracy</div>
-      </div>
-      <button onclick="showToast('⚔️ Πρόκληση στάλθηκε σε ${d.name}!')" style="background:rgba(179,136,255,0.1);border:1px solid rgba(179,136,255,0.3);color:var(--purple);padding:8px 14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:900;letter-spacing:.08em;cursor:pointer;">
-        ΠΡΟΚΛΗΣΗ
-      </button>
-    </div>
-  `).join('');
-}
-
-function renderFantasy(){
-  const team = document.getElementById('fantasyTeam');
-  const lb = document.getElementById('fantasyLb');
-  if(!team||!lb) return;
-
-  team.innerHTML = fantasyPlayers.map(p=>`
-    <div class="fantasy-slot filled">
-      <div class="fs-pos">${p.pos}</div>
-      <div class="fs-avatar">${p.emoji}</div>
-      <div class="fs-info">
-        <div class="fs-name">${p.name} <span style="font-size:9px;color:var(--muted)">${p.team}</span></div>
-        <div style="font-size:10px;color:var(--muted)">Αυτή εβδομάδα</div>
-      </div>
-      <div style="text-align:right">
-        <div class="fs-pts">${p.pts}</div>
-        <div style="font-size:9px;color:var(--green)">${p.trend} pts</div>
-      </div>
-    </div>
-  `).join('');
-
-  lb.innerHTML = fantasyLeaderboard.map((u,i)=>{
-    const rankEmoji = i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
-    const isMe = u.name==='@scout_gr';
-    return `
-    <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:${isMe?'rgba(0,230,118,0.04)':''};">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;min-width:32px">${rankEmoji}</div>
-      <div style="flex:1">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;${isMe?'color:var(--green)':''}">${u.name}${isMe?' ← ΕΣΥ':''}</div>
-        <div style="font-size:10px;color:var(--muted)">${u.team}</div>
-      </div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold)">${u.pts}</div>
-    </div>`;
-  }).join('');
-}
-
-// ─── NAVIGATION ───
-function switchView(name){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-
-  const viewEl = document.getElementById(name+'View');
-  if(viewEl) viewEl.classList.add('active');
-
-  const navEl = document.getElementById('nav-'+name);
-  if(navEl) navEl.classList.add('active');
-
-  const tabMap = {vote:0, board:1, duels:2, fantasy:3, scouts:4};
-  const tabs = document.querySelectorAll('.tab');
-  if(tabMap[name]!==undefined && tabs[tabMap[name]]) tabs[tabMap[name]].classList.add('active');
-
-  if(name==='board') updateLeaderboard();
-  if(name==='scouts') renderScouts();
-  if(name==='duels') renderDuels();
-  if(name==='fantasy') renderFantasy();
-}
-
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
-}
-
-// ─── PLAYER PROFILE DATA ───
-const playerProfiles = {
-  1: { // Dragowski
-    age:32, nationality:'🇵🇱', apps:22, goals:0, assists:0,
-    salaryW:'€18.000', salaryY:'€936.000', marketVal:'€3.2M',
-    tags:['Leader','Warrior'],
-    attrs:{ Αντανακλαστικά:16, Παιχνίδι:13, Αέρας:15, Ποδοσφαιρικ.:12, Ηγεσία:14, Αντοχή:15 },
-    monthly:[11,12,13,13,14,15,14,13,14,15,14,14],
-    career:[
-      {club:'Παναθηναϊκός',flag:'🇬🇷',years:'2023–τώρα',apps:58,goals:0,assists:0,current:true},
-      {club:'Fiorentina',flag:'🇮🇹',years:'2021–2023',apps:44,goals:0,assists:0},
-      {club:'Empoli',flag:'🇮🇹',years:'2019–2021',apps:68,goals:0,assists:0},
-      {club:'Sporting CP',flag:'🇵🇹',years:'2017–2019',apps:22,goals:0,assists:0},
-    ]
-  },
-  2: { // Μπακασέτας
-    age:30, nationality:'🇬🇷', apps:20, goals:8, assists:6,
-    salaryW:'€22.000', salaryY:'€1.14M', marketVal:'€5.5M',
-    tags:['Playmaker','Clutch','Leader'],
-    attrs:{ Τεχνική:17, Όραση:16, Σουτ:15, Ταχύτητα:13, Αντοχή:14, Ηγεσία:15 },
-    monthly:[12,13,14,15,15,16,14,15,16,15,15,15],
-    career:[
-      {club:'Παναθηναϊκός',flag:'🇬🇷',years:'2022–τώρα',apps:74,goals:28,assists:19,current:true},
-      {club:'AEK Athens',flag:'🇬🇷',years:'2019–2022',apps:88,goals:31,assists:22},
-      {club:'Toulouse',flag:'🇫🇷',years:'2016–2019',apps:92,goals:18,assists:14},
-      {club:'ΠΑΟΚ',flag:'🇬🇷',years:'2014–2016',apps:45,goals:9,assists:7},
-    ]
-  },
-  3: { // Λούσεγου
-    age:28, nationality:'🇨🇲', apps:21, goals:11, assists:3,
-    salaryW:'€25.000', salaryY:'€1.3M', marketVal:'€7M',
-    tags:['Clinical','Dribbler'],
-    attrs:{ Φινίρισμα:17, Ταχύτητα:18, Δεξιοτεχνία:16, Κεφαλιά:12, Αντοχή:15, Όραση:13 },
-    monthly:[14,13,15,16,15,14,16,17,15,14,15,16],
-    career:[
-      {club:'Παναθηναϊκός',flag:'🇬🇷',years:'2023–τώρα',apps:52,goals:29,assists:8,current:true},
-      {club:'Olympique Lyon',flag:'🇫🇷',years:'2020–2023',apps:78,goals:22,assists:11},
-      {club:'RC Lens',flag:'🇫🇷',years:'2017–2020',apps:84,goals:18,assists:9},
-    ]
-  },
-  4: { // Χουάν
-    age:27, nationality:'🇧🇷', apps:19, goals:3, assists:8,
-    salaryW:'€15.000', salaryY:'€780.000', marketVal:'€4M',
-    tags:['Engine','Warrior'],
-    attrs:{ Αντοχή:17, Πάσα:15, Pressing:16, Αερομαχίες:13, Ταχύτητα:14, Τεχνική:14 },
-    monthly:[11,12,12,13,13,14,13,12,13,14,13,12],
-    career:[
-      {club:'Παναθηναϊκός',flag:'🇬🇷',years:'2022–τώρα',apps:68,goals:9,assists:22,current:true},
-      {club:'Gremio',flag:'🇧🇷',years:'2019–2022',apps:95,goals:7,assists:18},
-      {club:'Athletico PR',flag:'🇧🇷',years:'2016–2019',apps:72,goals:4,assists:12},
-    ]
-  },
-  5: { // Σένγκε
-    age:26, nationality:'🇸🇳', apps:20, goals:1, assists:2,
-    salaryW:'€12.000', salaryY:'€624.000', marketVal:'€3.5M',
-    tags:['Warrior','Leader'],
-    attrs:{ Μαρκάρισμα:15, Αέρας:16, Ταχύτητα:15, Επικοιν.:13, Τεχνική:11, Αντοχή:16 },
-    monthly:[10,11,11,12,12,11,12,11,12,11,11,12],
-    career:[
-      {club:'Παναθηναϊκός',flag:'🇬🇷',years:'2023–τώρα',apps:44,goals:2,assists:4,current:true},
-      {club:'Dijon FCO',flag:'🇫🇷',years:'2020–2023',apps:80,goals:3,assists:5},
-      {club:'Génération Foot',flag:'🇸🇳',years:'2018–2020',apps:38,goals:1,assists:2},
-    ]
-  },
-  6: { // Έρικσεν (fictional)
-    age:31, nationality:'🇩🇰', apps:18, goals:0, assists:4,
-    salaryW:'€14.000', salaryY:'€728.000', marketVal:'€2.8M',
-    tags:['Leader','Warrior'],
-    attrs:{ Μαρκάρισμα:14, Αέρας:15, Επικοιν.:16, Ταχύτητα:12, Τεχνική:13, Αντοχή:14 },
-    monthly:[10,10,11,11,11,12,10,11,10,11,10,11],
-    career:[
-      {club:'Παναθηναϊκός',flag:'🇬🇷',years:'2024–τώρα',apps:28,goals:0,assists:4,current:true},
-      {club:'Brondby IF',flag:'🇩🇰',years:'2020–2024',apps:108,goals:4,assists:14},
-      {club:'FC Copenhagen',flag:'🇩🇰',years:'2016–2020',apps:92,goals:3,assists:11},
-    ]
-  },
-  7: { // Μαρκόβιτς
-    age:29, nationality:'🇷🇸', apps:21, goals:0, assists:0,
-    salaryW:'€16.000', salaryY:'€832.000', marketVal:'€3.8M',
-    tags:['Leader'],
-    attrs:{ Αντανακλαστικά:15, Παιχνίδι:14, Αέρας:14, Ποδοσφαιρικ.:13, Ηγεσία:13, Αντοχή:14 },
-    monthly:[12,12,13,13,13,13,12,13,14,13,13,13],
-    career:[
-      {club:'ΑΕΚ',flag:'🇬🇷',years:'2022–τώρα',apps:62,goals:0,assists:0,current:true},
-      {club:'Red Star Belgrade',flag:'🇷🇸',years:'2018–2022',apps:112,goals:0,assists:0},
-      {club:'Vojvodina',flag:'🇷🇸',years:'2015–2018',apps:74,goals:0,assists:0},
-    ]
-  },
-  8: { // Τσούμα
-    age:25, nationality:'🇨🇩', apps:22, goals:13, assists:5,
-    salaryW:'€28.000', salaryY:'€1.46M', marketVal:'€9M',
-    tags:['Clinical','Dribbler','Clutch'],
-    attrs:{ Φινίρισμα:18, Ταχύτητα:19, Δεξιοτεχνία:17, Κεφαλιά:11, Αντοχή:14, Όραση:14 },
-    monthly:[14,15,15,16,16,17,15,16,17,16,16,16],
-    career:[
-      {club:'ΑΕΚ',flag:'🇬🇷',years:'2024–τώρα',apps:38,goals:21,assists:8,current:true},
-      {club:'TP Mazembe',flag:'🇨🇩',years:'2021–2024',apps:88,goals:44,assists:12},
-      {club:'AS Vita Club',flag:'🇨🇩',years:'2019–2021',apps:52,goals:18,assists:7},
-    ]
-  },
-  9: { // Γκαρσία
-    age:28, nationality:'🇪🇸', apps:21, goals:4, assists:9,
-    salaryW:'€20.000', salaryY:'€1.04M', marketVal:'€5M',
-    tags:['Playmaker','Engine'],
-    attrs:{ Τεχνική:15, Όραση:16, Σουτ:13, Ταχύτητα:14, Αντοχή:16, Ηγεσία:13 },
-    monthly:[12,13,13,14,14,15,13,14,14,15,14,14],
-    career:[
-      {club:'ΑΕΚ',flag:'🇬🇷',years:'2023–τώρα',apps:56,goals:10,assists:22,current:true},
-      {club:'Getafe CF',flag:'🇪🇸',years:'2019–2023',apps:98,goals:8,assists:19},
-      {club:'Valencia B',flag:'🇪🇸',years:'2016–2019',apps:74,goals:6,assists:14},
-    ]
-  },
-  10: { // Σβάρνας
-    age:24, nationality:'🇬🇷', apps:20, goals:1, assists:3,
-    salaryW:'€11.000', salaryY:'€572.000', marketVal:'€2.5M',
-    tags:['Warrior'],
-    attrs:{ Μαρκάρισμα:14, Αέρας:13, Ταχύτητα:15, Επικοιν.:12, Τεχνική:12, Αντοχή:15 },
-    monthly:[10,10,11,11,12,12,11,12,12,12,12,12],
-    career:[
-      {club:'ΑΕΚ',flag:'🇬🇷',years:'2022–τώρα',apps:58,goals:2,assists:6,current:true},
-      {club:'Panathinaikos U21',flag:'🇬🇷',years:'2020–2022',apps:42,goals:1,assists:3},
-    ]
-  },
-  11: { // Στόχ
-    age:27, nationality:'🇩🇪', apps:19, goals:7, assists:4,
-    salaryW:'€19.000', salaryY:'€988.000', marketVal:'€5.5M',
-    tags:['Clinical','Dribbler'],
-    attrs:{ Φινίρισμα:15, Ταχύτητα:16, Δεξιοτεχνία:15, Κεφαλιά:13, Αντοχή:14, Όραση:13 },
-    monthly:[10,11,11,12,12,13,11,12,11,12,11,11],
-    career:[
-      {club:'ΑΕΚ',flag:'🇬🇷',years:'2023–τώρα',apps:44,goals:18,assists:9,current:true},
-      {club:'FC Augsburg',flag:'🇩🇪',years:'2019–2023',apps:88,goals:22,assists:14},
-      {club:'Borussia M\'gladbach II',flag:'🇩🇪',years:'2017–2019',apps:52,goals:11,assists:8},
-    ]
-  },
-};
-
-// ─── PROFILE FUNCTIONS ───
-function openProfile(pid){
-  const p = getPlayer(pid);
-  const pr = playerProfiles[pid];
-  const cv = communityVotes[pid];
-  const mv = myVotes[pid];
-  const displayRating = mv ? ((cv.avg*cv.count+mv.rating)/(cv.count+1)) : cv.avg;
-  const color = ratingColor(displayRating);
-
-  // Hero
-  document.getElementById('profAvatar').textContent = p.emoji;
-  document.getElementById('profTitle').textContent = p.name;
-  document.getElementById('profName').textContent = p.name;
-  document.getElementById('profSub').textContent = `${pr.nationality} · ${p.team} · ${p.pos} · #${p.num}`;
-  document.getElementById('profScore').textContent = displayRating.toFixed(1);
-  document.getElementById('profScore').style.color = color;
-  document.getElementById('profBadges').innerHTML = pr.tags.map(t=>`<span class="prof-badge">${t}</span>`).join('');
-
-  // Stats
-  document.getElementById('profAge').textContent = pr.age;
-  document.getElementById('profApps').textContent = pr.apps;
-  document.getElementById('profGoals').textContent = `${pr.goals}/${pr.assists}`;
-  document.getElementById('profVotes').textContent = (cv.count+(mv?1:0)).toLocaleString();
-
-  // Salary
-  document.getElementById('profSalaryW').textContent = pr.salaryW;
-  document.getElementById('profSalaryY').textContent = pr.salaryY + ' ετησίως';
-  document.getElementById('profMarketVal').textContent = pr.marketVal;
-
-  // Radar
-  drawRadar(pr.attrs);
-
-  // Monthly chart
-  drawMonthlyChart(pr.monthly);
-
-  // Career
-  drawCareer(pr.career);
-
-  // Open
-  document.getElementById('profileOverlay').classList.add('open');
-  document.getElementById('profileOverlay').scrollTop = 0;
-}
-
-function closeProfile(){
-  document.getElementById('profileOverlay').classList.remove('open');
-}
-
-// ─── RADAR POLYGON ───
-function drawRadar(attrs){
-  const svg = document.getElementById('radarSVG');
-  const cx=110, cy=110, r=80;
-  const keys = Object.keys(attrs);
-  const n = keys.length;
-  const angleStep = (Math.PI*2)/n;
-
-  // Grid
-  let html = '';
-  [0.25,0.5,0.75,1].forEach(scale=>{
-    let pts = keys.map((_,i)=>{
-      const a = -Math.PI/2 + i*angleStep;
-      return `${cx+r*scale*Math.cos(a)},${cy+r*scale*Math.sin(a)}`;
-    }).join(' ');
-    html += `<polygon points="${pts}" fill="none" stroke="#1a1f2e" stroke-width="1"/>`;
-  });
-
-  // Axes
-  keys.forEach((_,i)=>{
-    const a = -Math.PI/2 + i*angleStep;
-    html += `<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(a)}" y2="${cy+r*Math.sin(a)}" stroke="#1a1f2e" stroke-width="1"/>`;
-  });
-
-  // Data polygon
-  const vals = keys.map(k=>attrs[k]/20);
-  let dataPts = vals.map((v,i)=>{
-    const a = -Math.PI/2 + i*angleStep;
-    return `${cx+r*v*Math.cos(a)},${cy+r*v*Math.sin(a)}`;
-  }).join(' ');
-  html += `<polygon points="${dataPts}" fill="rgba(0,230,118,0.15)" stroke="#00e676" stroke-width="2"/>`;
-
-  // Dots
-  vals.forEach((v,i)=>{
-    const a = -Math.PI/2 + i*angleStep;
-    const x = cx+r*v*Math.cos(a), y = cy+r*v*Math.sin(a);
-    html += `<circle cx="${x}" cy="${y}" r="4" fill="#00e676"/>`;
-  });
-
-  // Labels
-  keys.forEach((k,i)=>{
-    const a = -Math.PI/2 + i*angleStep;
-    const lx = cx+(r+18)*Math.cos(a), ly = cy+(r+18)*Math.sin(a);
-    const anchor = lx<cx-5?'end':lx>cx+5?'start':'middle';
-    html += `<text x="${lx}" y="${ly+4}" text-anchor="${anchor}" fill="#3d4560" font-family="'Barlow Condensed',sans-serif" font-size="10" letter-spacing="1">${k.toUpperCase()}</text>`;
-  });
-
-  svg.innerHTML = html;
-
-  // Legend
-  const legend = document.getElementById('radarLegend');
-  legend.innerHTML = keys.map(k=>{
-    const v = attrs[k];
-    const c = ratingColor(v);
-    return `<div class="radar-leg-item">
-      <span class="radar-leg-name">${k}</span>
-      <span class="radar-leg-val" style="color:${c}">${v}/20</span>
-    </div>`;
-  }).join('');
-}
-
-// ─── MONTHLY LINE CHART ───
-function drawMonthlyChart(monthly){
-  const months = ['Ιούλ','Αύγ','Σεπ','Οκτ','Νοε','Δεκ','Ιαν','Φεβ','Μαρ','Απρ','Μάι','Ιούν'];
-  const svg = document.getElementById('chartSVG');
-  const W=340, H=140, padL=28, padR=12, padT=14, padB=30;
-  const gW=W-padL-padR, gH=H-padT-padB;
-  const n = monthly.length;
-  const minV=Math.max(0,Math.min(...monthly)-2), maxV=Math.min(20,Math.max(...monthly)+1);
-
-  function xPos(i){ return padL + (i/(n-1))*gW; }
-  function yPos(v){ return padT + (1-(v-minV)/(maxV-minV))*gH; }
-
-  let html='';
-
-  // Grid lines
-  [minV, Math.round((minV+maxV)/2), maxV].forEach(v=>{
-    const y=yPos(v);
-    html+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#1a1f2e" stroke-width="1"/>`;
-    html+=`<text x="${padL-4}" y="${y+4}" text-anchor="end" fill="#3d4560" font-size="9" font-family="'Bebas Neue',sans-serif">${v}</text>`;
-  });
-
-  // Area fill
-  const pts = monthly.map((v,i)=>`${xPos(i)},${yPos(v)}`).join(' ');
-  const areaPath = `M${xPos(0)},${yPos(monthly[0])} ` +
-    monthly.map((v,i)=>`L${xPos(i)},${yPos(v)}`).join(' ') +
-    ` L${xPos(n-1)},${padT+gH} L${xPos(0)},${padT+gH} Z`;
-  html+=`<path d="${areaPath}" fill="rgba(0,230,118,0.08)"/>`;
-
-  // Line
-  const linePath = `M${xPos(0)},${yPos(monthly[0])} ` + monthly.map((v,i)=>`L${xPos(i)},${yPos(v)}`).join(' ');
-  html+=`<path d="${linePath}" fill="none" stroke="#00e676" stroke-width="2.5" stroke-linejoin="round"/>`;
-
-  // Dots + labels
-  monthly.forEach((v,i)=>{
-    const x=xPos(i), y=yPos(v);
-    const isLast = i===n-1;
-    const isMax = v===Math.max(...monthly);
-    html+=`<circle cx="${x}" cy="${y}" r="${isMax?5:3}" fill="${isMax?'#00e676':'#1a1f2e'}" stroke="#00e676" stroke-width="2"/>`;
-    if(isMax||isLast){
-      html+=`<text x="${x}" y="${y-8}" text-anchor="middle" fill="#00e676" font-size="9" font-family="'Bebas Neue',sans-serif">${v}</text>`;
+  db.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      currentUser = session.user;
+      await loadProfile();
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainHeader').style.display = 'block';
+      document.getElementById('mainNav').style.display = 'block';
+      showPage('page-home');
+      await loadPlayers();
     }
-    // Month label
-    html+=`<text x="${x}" y="${H-6}" text-anchor="middle" fill="#3d4560" font-size="8" font-family="'Barlow Condensed',sans-serif" letter-spacing="0.5">${months[i]}</text>`;
   });
-
-  svg.innerHTML = html;
 }
 
-// ─── CAREER TIMELINE ───
-function drawCareer(career){
-  const el = document.getElementById('careerList');
-  el.innerHTML = career.map((c,i)=>{
-    const isLast = i===career.length-1;
-    return `
-    <div class="career-item">
-      <div class="career-line">
-        <div class="career-dot ${c.current?'current':''}"></div>
-        ${!isLast?'<div class="career-connector"></div>':''}
+// ═══════════════════════════════════════
+// PROFILE
+// ═══════════════════════════════════════
+async function loadProfile() {
+  if (!currentUser) return;
+  let { data } = await db.from('profiles').select('*').eq('id', currentUser.id).single();
+  if (!data) {
+    const { data: newProfile } = await db.from('profiles').insert({
+      id: currentUser.id,
+      username: currentUser.user_metadata?.full_name || 'Scout',
+      avatar_url: currentUser.user_metadata?.avatar_url || null,
+      xp: 0, streak: 0
+    }).select().single();
+    data = newProfile;
+  }
+  currentProfile = data;
+  updateProfileUI();
+}
+
+function updateProfileUI() {
+  if (!currentProfile) return;
+  const xp = currentProfile.xp || 0;
+  const streak = currentProfile.streak || 0;
+  const name = currentProfile.username || 'Scout';
+
+  document.getElementById('xpCount').textContent = xp + ' XP';
+  document.getElementById('xpFill').style.width = Math.min(100, (xp / 500) * 100) + '%';
+  document.getElementById('streakN').textContent = streak;
+  document.getElementById('profileName').textContent = name;
+  document.getElementById('pXP').textContent = xp;
+  document.getElementById('pStreak').textContent = '🔥' + streak;
+
+  const level = xp < 100 ? 'BRONZE' : xp < 300 ? 'SILVER' : xp < 600 ? 'GOLD' : 'EXPERT';
+  const levelEmoji = xp < 100 ? '🥉' : xp < 300 ? '🥈' : xp < 600 ? '🥇' : '💎';
+  document.getElementById('levelBadge').textContent = level;
+  document.getElementById('profileLevel').textContent = levelEmoji + ' ' + level + ' SCOUT';
+
+  const av = document.getElementById('profileAv');
+  if (currentUser?.user_metadata?.avatar_url) {
+    av.innerHTML = `<img src="${currentUser.user_metadata.avatar_url}" alt="avatar"/>`;
+  }
+}
+
+// ═══════════════════════════════════════
+// PLAYERS
+// ═══════════════════════════════════════
+async function loadPlayers() {
+  const { data, error } = await db.from('players').select('*').order('name');
+  if (error) { console.error(error); return; }
+  allPlayers = data || [];
+
+  // Load vote counts
+  const { data: votesData } = await db.from('votes').select('player_id, score');
+  const voteCounts = {};
+  const voteAvgs = {};
+  if (votesData) {
+    votesData.forEach(v => {
+      if (!voteCounts[v.player_id]) { voteCounts[v.player_id] = 0; voteAvgs[v.player_id] = []; }
+      voteCounts[v.player_id]++;
+      voteAvgs[v.player_id].push(v.score);
+    });
+  }
+
+  allPlayers = allPlayers.map((p, i) => ({
+    ...p,
+    voteCount: voteCounts[p.id] || 0,
+    avgScore: voteAvgs[p.id] ? Math.round(voteAvgs[p.id].reduce((a,b)=>a+b,0)/voteAvgs[p.id].length) : null,
+    cardType: CARD_TYPES[i % CARD_TYPES.length],
+    avatar: AVATARS[i % AVATARS.length],
+    locked: (voteCounts[p.id] || 0) < 20
+  }));
+
+  renderHotCards();
+  renderRankList();
+  renderAllPlayers();
+  renderH2H();
+
+  if (currentUser) {
+    const { count } = await db.from('votes').select('*', {count:'exact',head:true}).eq('user_id', currentUser.id);
+    document.getElementById('pVotes').textContent = count || 0;
+  }
+}
+
+function renderHotCards() {
+  const top4 = [...allPlayers].sort((a,b) => (b.voteCount - a.voteCount)).slice(0, 6);
+  document.getElementById('hotCards').innerHTML = top4.map((p, i) => buildFifaCard(p, i)).join('');
+}
+
+function buildFifaCard(p, i) {
+  const rating = p.avgScore || '?';
+  const locked = p.locked;
+  const type = p.cardType;
+  const statsHtml = locked
+    ? `<div class="card-locked-overlay"><div style="font-size:22px;opacity:0.6;">🔒</div><div class="lock-mini-bar"><div class="lock-mini-fill" style="width:${Math.min(100,(p.voteCount/20)*100)}%"></div></div><div class="lock-votes">${p.voteCount} / 20 ψήφοι</div></div>`
+    : `<div class="card-divider"></div><div class="card-stats"><div class="cs"><div class="cs-val">${rating}</div><div class="cs-lbl">RATING</div></div><div class="cs"><div class="cs-val">${p.voteCount}</div><div class="cs-lbl">ΨΗΦΟΙ</div></div></div>`;
+  return `
+    <div class="fifa-card ${type}" onclick="openPlayer('${p.id}')" style="animation-delay:${i*0.05}s">
+      <div class="card-top"><div class="card-left-info">
+        <div class="card-rating">${locked ? '?' : rating}</div>
+        <div class="card-pos">${p.position?.substring(0,3).toUpperCase() || 'MID'}</div>
+      </div></div>
+      <div class="card-img-wrap"><div class="card-avatar">${p.avatar}</div></div>
+      <div class="card-name">${p.name.split(' ').pop()}</div>
+      ${statsHtml}
+    </div>`;
+}
+
+function renderRankList() {
+  const sorted = [...allPlayers].filter(p => !p.locked && p.avgScore).sort((a,b) => b.avgScore - a.avgScore);
+  const medals = ['g','s','b','o','o','o'];
+  document.getElementById('rankList').innerHTML = sorted.slice(0,6).map((p,i) => `
+    <div class="rank-row" onclick="openPlayer('${p.id}')" style="animation-delay:${i*0.04}s">
+      <div class="rank-n ${medals[i]||'o'}">${i+1}</div>
+      <div class="rank-av">${p.avatar}</div>
+      <div class="rank-info">
+        <div class="rank-name">${p.name}</div>
+        <div class="rank-sub">${p.team} · ${p.position}</div>
       </div>
-      <div class="career-content">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="career-flag">${c.flag}</span>
-          <span class="career-club">${c.club}</span>
-          ${c.current?'<span style="background:var(--green);color:#000;font-size:8px;font-family:Barlow Condensed,sans-serif;font-weight:900;padding:2px 6px;letter-spacing:.08em">ΤΩΡΑ</span>':''}
-        </div>
-        <div class="career-years">${c.years}</div>
-        <div class="career-apps">
-          <div class="career-app-stat"><span>${c.apps}</span>Εμφ.</div>
-          <div class="career-app-stat"><span>${c.goals}</span>Γκολ</div>
-          <div class="career-app-stat"><span>${c.assists}</span>Ασίστ</div>
-        </div>
+      <div class="rank-score">
+        <div class="rank-val">${p.avgScore}</div>
+        <div class="rank-votes">${p.voteCount} ψήφοι</div>
       </div>
+    </div>`).join('') || '<div class="loading">Δεν υπάρχουν αξιολογήσεις ακόμα</div>';
+}
+
+function renderAllPlayers() {
+  const sorted = [...allPlayers].sort((a,b) => b.voteCount - a.voteCount);
+  const medals = ['g','s','b'];
+  document.getElementById('allPlayersList').innerHTML = sorted.map((p,i) => `
+    <div class="rank-row" onclick="openPlayer('${p.id}')" style="animation-delay:${i*0.03}s">
+      <div class="rank-n ${medals[i]||'o'}">${i+1}</div>
+      <div class="rank-av">${p.avatar}</div>
+      <div class="rank-info">
+        <div class="rank-name">${p.name}</div>
+        <div class="rank-sub">${p.team} · ${p.position}</div>
+      </div>
+      <div class="rank-score">
+        <div class="rank-val">${p.locked ? '<span style="color:var(--txt3);font-size:16px;">???</span>' : (p.avgScore||'—')}</div>
+        <div class="rank-votes">${p.voteCount} ψήφοι</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderH2H() {
+  const eligible = allPlayers.filter(p => p.voteCount > 0);
+  if (eligible.length < 2) {
+    document.getElementById('h2hContent').innerHTML = '<div class="loading">Χρειάζονται περισσότερες ψήφοι για H2H</div>';
+    return;
+  }
+  const shuffle = [...eligible].sort(() => Math.random() - 0.5);
+  const p1 = shuffle[0], p2 = shuffle[1];
+  document.getElementById('h2hContent').innerHTML = `
+    <div class="h2h-card">
+      <div class="h2h-top"><div class="h2h-tag">H2H</div><div class="h2h-q">Ποιος είναι καλύτερος;</div></div>
+      <div class="h2h-arena">
+        <div class="h2h-p"><div class="h2h-av a">${p1.avatar}</div><div class="h2h-pname">${p1.name.split(' ').pop()}</div><div class="h2h-pteam">${p1.team}</div></div>
+        <div class="h2h-vs">VS</div>
+        <div class="h2h-p"><div class="h2h-av b">${p2.avatar}</div><div class="h2h-pname">${p2.name.split(' ').pop()}</div><div class="h2h-pteam">${p2.team}</div></div>
+      </div>
+      <div class="h2h-actions">
+        <div class="h2h-btn" onclick="doH2H('${p1.id}','${p1.name}')">👈 ${p1.name.split(' ').pop().toUpperCase()}</div>
+        <div class="h2h-btn" onclick="doH2H('${p2.id}','${p2.name}')">ΕΠΟΜΕΝΟ 👉</div>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════
+// PLAYER DETAIL
+// ═══════════════════════════════════════
+function openPlayer(id) {
+  const p = allPlayers.find(x => x.id === id);
+  if (!p) return;
+  currentPlayer = p;
+
+  document.getElementById('d-name').textContent = p.name.toUpperCase();
+  document.getElementById('d-team').textContent = p.team.toUpperCase();
+  document.getElementById('d-pos').textContent = p.position?.substring(0,3).toUpperCase() || 'MID';
+  document.getElementById('d-avatar').textContent = p.avatar;
+  document.getElementById('d-rating').textContent = p.locked ? '?' : (p.avgScore || '—');
+
+  document.getElementById('d-stats-grid').innerHTML = `
+    <div class="bst"><div class="bst-val">${p.avgScore||'?'}</div><div class="bst-lbl">RATING</div></div>
+    <div class="bst"><div class="bst-val">${p.voteCount}</div><div class="bst-lbl">ΨΗΦΟΙ</div></div>
+    <div class="bst"><div class="bst-val">${p.age||'—'}</div><div class="bst-lbl">ΗΛΙΚΙΑ</div></div>
+    <div class="bst"><div class="bst-val">${p.nationality||'GR'}</div><div class="bst-lbl">ΕΘΝΙΚ.</div></div>`;
+
+  buildFMRows(p);
+  buildRadar(p);
+
+  if (p.locked) {
+    document.getElementById('unlockBarWrap').style.display = 'block';
+    document.getElementById('unlockNums').textContent = `${p.voteCount}/20`;
+    document.getElementById('unlockFill').style.width = Math.min(100,(p.voteCount/20)*100) + '%';
+  } else {
+    document.getElementById('unlockBarWrap').style.display = 'none';
+  }
+
+  prevPage = document.querySelector('.page.active')?.id || 'page-home';
+  gotoPage('page-player');
+}
+
+function buildFMRows(p) {
+  const stats = [
+    {lbl:'Rating', val: p.locked ? null : p.avgScore},
+    {lbl:'Ψήφοι', val: p.voteCount},
+    {lbl:'Ηλικία', val: p.age},
+    {lbl:'Εθνικότητα', val: p.nationality === 'GR' ? 'Ελλάδα' : p.nationality},
+  ];
+  document.getElementById('fm-rows').innerHTML = stats.map(s => {
+    const isNum = typeof s.val === 'number';
+    const cls = !isNum ? '' : s.val >= 70 ? 'hi' : s.val >= 50 ? 'mid' : 'lo';
+    const w = isNum ? s.val : 0;
+    return `<div class="fm-row">
+      <div class="fm-lbl">${s.lbl}</div>
+      <div class="fm-bar"><div class="fm-fill ${s.val===null?'locked':cls}" style="width:${s.val===null?100:Math.min(100,w)}%"></div></div>
+      <div class="fm-num${s.val===null?' locked':''}">${s.val===null?'???':s.val}</div>
     </div>`;
   }).join('');
 }
 
-// ─── INIT ───
-renderPlayers();
-updateLeaderboard();
-renderScouts();
+function buildRadar(p) {
+  const svg = document.getElementById('radarSvg');
+  const cx=100, cy=100, r=72;
+  const keys = ['Rating','Ψήφοι','Ομάδα','Θέση','Εθνικ.','Ηλικία'];
+  const rawVals = [p.avgScore||0, Math.min(100,p.voteCount*5), 70, 65, 75, 70];
+  const vals = p.locked ? [0,0,0,0,0,0] : rawVals;
+  const n = keys.length;
+  const toXY = (i, val) => {
+    const angle = (Math.PI*2/n)*i - Math.PI/2;
+    const dist = (val/100)*r;
+    return [cx + dist*Math.cos(angle), cy + dist*Math.sin(angle)];
+  };
+  let g = '';
+  [20,40,60,80,100].forEach(pct => {
+    const pts = keys.map((_,i) => toXY(i,pct).join(',')).join(' ');
+    g += `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+  });
+  keys.forEach((_,i) => { const[x,y]=toXY(i,100); g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`; });
+  const dataPts = vals.map((v,i) => toXY(i,v).join(',')).join(' ');
+  let labels = '';
+  keys.forEach((k,i) => { const[x,y]=toXY(i,118); labels+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" fill="#7a90a8" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700">${k}</text>`; });
+  svg.innerHTML = `${g}<polygon points="${dataPts}" fill="rgba(0,240,200,0.12)" stroke="var(--teal)" stroke-width="1.5"/>${vals.map((v,i)=>{const[x,y]=toXY(i,v);return`<circle cx="${x}" cy="${y}" r="3" fill="var(--teal)"/>`;}).join('')}${labels}`;
+}
+
+// ═══════════════════════════════════════
+// VOTING
+// ═══════════════════════════════════════
+async function submitVote() {
+  if (!currentPlayer) return;
+  const score = parseInt(document.getElementById('svBig').textContent);
+
+  if (!currentUser) { showToast('🔒 Συνδέσου για να ψηφίσεις!'); return; }
+
+  const { error } = await db.from('votes').upsert({
+    player_id: currentPlayer.id,
+    user_id: currentUser.id,
+    score: score
+  }, { onConflict: 'player_id,user_id' });
+
+  if (error) { showToast('❌ Σφάλμα: ' + error.message); return; }
+
+  // Add XP
+  const newXP = (currentProfile?.xp || 0) + 5;
+  await db.from('profiles').update({ xp: newXP }).eq('id', currentUser.id);
+  if (currentProfile) currentProfile.xp = newXP;
+  updateProfileUI();
+
+  showToast('⚡ +5 XP ΚΕΡΔΙΣΕΣ!');
+  await loadPlayers();
+  gotoPage(prevPage);
+}
+
+async function doH2H(playerId, playerName) {
+  if (!currentUser) { showToast('🔒 Συνδέσου για να ψηφίσεις!'); return; }
+  const score = Math.floor(Math.random() * 20) + 70;
+  await db.from('votes').upsert({ player_id: playerId, user_id: currentUser.id, score }, { onConflict: 'player_id,user_id' });
+  const newXP = (currentProfile?.xp || 0) + 8;
+  await db.from('profiles').update({ xp: newXP }).eq('id', currentUser.id);
+  if (currentProfile) currentProfile.xp = newXP;
+  updateProfileUI();
+  showToast(`✅ ${playerName.split(' ').pop()} — +8 XP`);
+  await loadPlayers();
+  renderH2H();
+}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function gotoPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+  window.scrollTo(0,0);
+}
+function showPage(id) { gotoPage(id); }
+function navClick(el, pageId) {
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  prevPage = pageId;
+  gotoPage(pageId);
+}
+function selLeague(el) {
+  el.closest('.league-bar').querySelectorAll('.ltab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+function setVtab(el, id) {
+  document.querySelectorAll('.vtab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('vt-slider').style.display = id==='vt-slider'?'block':'none';
+  document.getElementById('vt-stars').style.display = id==='vt-stars'?'block':'none';
+}
+function setStar(n) {
+  selectedStars = n;
+  document.querySelectorAll('.star-btn').forEach((s,i) => s.classList.toggle('on', i<n));
+  document.getElementById('svBig').textContent = Math.round(n * 20);
+}
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+function showToast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1400);
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+initAuth();
 </script>
 </body>
 </html>
