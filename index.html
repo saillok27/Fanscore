@@ -483,6 +483,11 @@ async function initAuth() {
   if (session) {
     currentUser = session.user;
     await loadProfile();
+    // Αν δεν έχει ολοκληρώσει onboarding → redirect
+    if (!currentProfile?.fav_team_id) {
+      window.location.href = '/onboarding.html';
+      return;
+    }
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('mainHeader').style.display = 'block';
     document.getElementById('mainNav').style.display = 'block';
@@ -494,6 +499,11 @@ async function initAuth() {
     if (event === 'SIGNED_IN' && session) {
       currentUser = session.user;
       await loadProfile();
+      // Αν δεν έχει ολοκληρώσει onboarding → redirect
+      if (!currentProfile?.fav_team_id) {
+        window.location.href = '/onboarding.html';
+        return;
+      }
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainHeader').style.display = 'block';
       document.getElementById('mainNav').style.display = 'block';
