@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FanScore — Welcome</title>
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500&display=swap');
+
+:root {
+  --bg: #06080e;
+  --card: #0b0e18;
+  --card2: #0f1320;
+  --border: #161c2e;
+  --green: #00e676;
+  --gold: #FFD700;
+  --blue: #4fc3f7;
+  --purple: #b388ff;
+  --red: #ff5252;
+  --orange: #ff9100;
+  --text: #e8ecf4;
+  --muted: #3a4260;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+
+/* BACKGROUND */
+body::before {
+  content:''; position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0,230,118,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 80% 80%, rgba(79,195,247,0.04) 0%, transparent 50%);
+  pointer-events:none;
+}
+
+/* GRID OVERLAY */
+body::after {
+  content:''; position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events:none;
+}
+
+/* ─── WRAPPER ─── */
+.wrap {
+  width: 100%;
+  max-width: 480px;
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  padding: 0 0 40px;
+  overflow: hidden;
+}
+
+/* ─── TOP BAR ─── */
+.top-bar {
+  padding: 24px 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px; letter-spacing: .06em;
+}
+.logo span { color: var(--green); }
+
+.step-counter {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: .15em;
+  color: var(--muted);
+}
+.step-counter span { color: var(--green); }
+
+/* ─── PROGRESS ─── */
+.progress-track {
+  margin: 16px 24px 0;
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 1px;
+  transition: width .5s cubic-bezier(.4,0,.2,1);
+}
+
+/* ─── SCREEN ─── */
+.screen {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  padding: 32px 24px 0;
+  animation: fadeUp .4s ease both;
+}
+.screen.active { display: flex; }
+
+/* Step 3 scrollable team list */
+#step3 {
+  padding-bottom: 0;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+#step3 .team-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  min-height: 0;
+  padding-bottom: 8px;
+}
+#step3 .sticky-cta {
+  padding: 12px 0 0;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(16px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.screen-tag {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: .3em;
+  text-transform: uppercase; color: var(--green);
+  margin-bottom: 8px;
+}
+.screen-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 8vw, 3rem);
+  letter-spacing: .03em; line-height: 1;
+  margin-bottom: 6px;
+}
+.screen-sub {
+  font-size: 12px; color: var(--muted);
+  line-height: 1.6; margin-bottom: 28px;
+}
+
+/* ─── OPTION GRID ─── */
+.option-grid {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.option-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.option-grid.cols-1 { grid-template-columns: 1fr; }
+
+.option-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: all .2s;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.option-card::before {
+  content: '';
+  position: absolute; top:0; left:0; right:0; height: 2px;
+  background: var(--o-color, var(--green));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .25s;
+}
+.option-card:hover { border-color: var(--o-color, var(--green)); transform: translateY(-2px); }
+.option-card:hover::before { transform: scaleX(1); }
+.option-card.selected {
+  border-color: var(--o-color, var(--green));
+  background: rgba(0,0,0,.2);
+}
+.option-card.selected::before { transform: scaleX(1); }
+
+.option-emoji { font-size: 32px; flex-shrink: 0; }
+.option-info { flex: 1; }
+.option-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 17px; font-weight: 900; letter-spacing: .03em;
+  color: var(--o-color, var(--text));
+}
+.option-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+.option-check {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border); border-radius: 50%;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all .2s;
+}
+.option-card.selected .option-check {
+  background: var(--o-color, var(--green));
+  border-color: var(--o-color, var(--green));
+  color: #000;
+}
+
+/* ─── USERNAME INPUT ─── */
+.input-wrap {
+  margin-bottom: 12px;
+  position: relative;
+}
+.input-prefix {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px; font-weight: 700; color: var(--green);
+  z-index: 1; pointer-events: none;
+}
+.username-input {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px; font-weight: 700; letter-spacing: .04em;
+  padding: 18px 18px 18px 36px;
+  outline: none;
+  transition: border-color .2s;
+  caret-color: var(--green);
+}
+.username-input:focus { border-color: var(--green); }
+.username-input::placeholder { color: var(--muted); }
+
+.validation-msg {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: .05em;
+  border: 1px solid; margin-bottom: 12px;
+  transition: all .2s;
+}
+.validation-msg.ok { border-color: rgba(0,230,118,.3); color: var(--green); background: rgba(0,230,118,.05); }
+.validation-msg.err { border-color: rgba(255,82,82,.3); color: var(--red); background: rgba(255,82,82,.05); }
+.validation-msg.warn { border-color: rgba(255,215,0,.3); color: var(--gold); background: rgba(255,215,0,.05); }
+
+.rules-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  margin-bottom: 24px;
+}
+.rule-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--muted);
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: .04em;
+  transition: color .2s;
+}
+.rule-item.pass { color: var(--green); }
+.rule-item.fail { color: var(--red); }
+.rule-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--muted); flex-shrink: 0; transition: background .2s;
+}
+.rule-item.pass .rule-dot { background: var(--green); }
+.rule-item.fail .rule-dot { background: var(--red); }
+
+/* ─── SUMMARY CARD ─── */
+.summary-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 20px;
+  position: relative; overflow: hidden;
+}
+.summary-card::before {
+  content: ''; position: absolute; top:0; left:0; right:0; height: 2px;
+  background: linear-gradient(90deg, var(--green), var(--blue));
+}
+.summary-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-icon { font-size: 20px; width: 28px; text-align: center; }
+.summary-key {
+  font-size: 10px; color: var(--muted); letter-spacing: .1em;
+  text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif;
+  min-width: 80px;
+}
+.summary-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px; font-weight: 900; flex: 1;
+}
+
+/* ─── CTA BUTTON ─── */
+.cta {
+  width: 100%;
+  padding: 16px;
+  background: var(--green);
+  color: #000;
+  border: none;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px; font-weight: 900; letter-spacing: .18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity .2s, transform .1s;
+  margin-top: auto;
+}
+.cta:hover { opacity: .9; }
+.cta:active { transform: scale(.99); }
+.cta:disabled { opacity: .3; cursor: not-allowed; }
+
+.cta-secondary {
+  width: 100%;
+  padding: 13px;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: .12em;
+  cursor: pointer; margin-top: 10px;
+  transition: all .2s;
+}
+.cta-secondary:hover { border-color: var(--green); color: var(--green); }
+
+/* ─── SCOUT BADGE ─── */
+.scout-badge {
+  text-align: center;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.badge-circle {
+  width: 80px; height: 80px; border-radius: 50%;
+  border: 3px solid var(--green);
+  background: linear-gradient(135deg, #0a1a0d, var(--card));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; margin: 0 auto 12px;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(0,230,118,.3); }
+  50% { box-shadow: 0 0 0 12px rgba(0,230,118,0); }
+}
+.badge-tier {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px; letter-spacing: .08em; color: var(--green);
+  margin-bottom: 4px;
+}
+.badge-sub { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+/* ─── COMING SOON CHIPS ─── */
+.coming-soon {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.cs-chip {
+  font-size: 10px; font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; letter-spacing: .1em;
+  padding: 4px 10px; border: 1px solid var(--border); color: var(--muted);
+  opacity: .5;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="logo">Fan<span>Score</span></div>
+    <div class="step-counter">ΒΗΜΑ <span id="stepNum">1</span> / 5</div>
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:20%"></div>
+  </div>
+
+  <!-- ══════════ STEP 1 — SPORT ══════════ -->
+  <div class="screen active" id="step1">
+    <div class="screen-tag">▸ Καλωσόρισες στο FanScore</div>
+    <div class="screen-title">Διάλεξε<br>Sport</div>
+    <div class="screen-sub">Ξεκινάμε με αυτό που αγαπάς.</div>
+
+    <div class="option-grid cols-2">
+      <div class="option-card selected" style="--o-color:#00e676" onclick="selectOption('sport','football','⚽ Football',this)">
+        <div class="option-emoji">⚽</div>
+        <div class="option-info">
+          <div class="option-name">Football</div>
+          <div class="option-sub">Super League & Βαλκάνια</div>
+        </div>
+        <div class="option-check">✓</div>
+      </div>
+      <div class="option-card" style="--o-color:#ff9100" onclick="selectOption('sport','basketball','🏀 Basketball',this)">
+        <div class="option-emoji">🏀</div>
+        <div class="option-info">
+          <div class="option-name">Basketball</div>
+          <div class="option-sub">HEBA · Euroleague</div>
+        </div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" style="--o-color:#4fc3f7;opacity:.5;cursor:not-allowed" onclick="showComingSoon()">
+        <div class="option-emoji">🏐</div>
+        <div class="option-info">
+          <div class="option-name">Volleyball</div>
+          <div class="option-sub">Σύντομα...</div>
+        </div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" style="--o-color:#b388ff;opacity:.5;cursor:not-allowed" onclick="showComingSoon()">
+        <div class="option-emoji">🎾</div>
+        <div class="option-info">
+          <div class="option-name">Tennis</div>
+          <div class="option-sub">Σύντομα...</div>
+        </div>
+        <div class="option-check"></div>
+      </div>
+    </div>
+
+    <button class="cta" onclick="nextStep()">ΣΥΝΕΧΕΙΑ →</button>
+  </div>
+
+  <!-- ══════════ STEP 2 — COUNTRY ══════════ -->
+  <div class="screen" id="step2">
+    <div class="screen-tag">▸ Επιλογή Χώρας</div>
+    <div class="screen-title">Ποια<br>Χώρα;</div>
+    <div class="screen-sub">Θα δεις αγώνες και παίκτες από αυτή κυρίως.</div>
+
+    <div class="option-grid cols-2">
+      <div class="option-card" style="--o-color:#00e676" onclick="selectOption('country','gr','🇬🇷 Ελλάδα',this)">
+        <div class="option-emoji">🇬🇷</div>
+        <div class="option-info">
+          <div class="option-name">Ελλάδα</div>
+          <div class="option-sub">Super League</div>
+        </div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" style="--o-color:#4fc3f7" onclick="selectOption('country','rs','🇷🇸 Σερβία',this)">
+        <div class="option-emoji">🇷🇸</div>
+        <div class="option-info">
+          <div class="option-name">Σερβία</div>
+          <div class="option-sub">Superliga</div>
+        </div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" style="--o-color:#FFD700" onclick="selectOption('country','bg','🇧🇬 Βουλγαρία',this)">
+        <div class="option-emoji">🇧🇬</div>
+        <div class="option-info">
+          <div class="option-name">Βουλγαρία</div>
+          <div class="option-sub">First League</div>
+        </div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" style="--o-color:#ff9100" onclick="selectOption('country','cy','🇨🇾 Κύπρος',this)">
+        <div class="option-emoji">🇨🇾</div>
+        <div class="option-info">
+          <div class="option-name">Κύπρος</div>
+          <div class="option-sub">1η Κατηγορία</div>
+        </div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" style="--o-color:#b388ff" onclick="selectOption('country','hr','🇭🇷 Κροατία',this)">
+        <div class="option-emoji">🇭🇷</div>
+        <div class="option-info">
+          <div class="option-name">Κροατία</div>
+          <div class="option-sub">HNL</div>
+        </div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" style="--o-color:#ff5252" onclick="selectOption('country','ro','🇷🇴 Ρουμανία',this)">
+        <div class="option-emoji">🇷🇴</div>
+        <div class="option-info">
+          <div class="option-name">Ρουμανία</div>
+          <div class="option-sub">Liga I</div>
+        </div>
+        <div class="option-check"></div>
+      </div>
+    </div>
+
+    <button class="cta" id="cta2" disabled onclick="nextStep()">ΣΥΝΕΧΕΙΑ →</button>
+    <button class="cta-secondary" onclick="prevStep()">← ΠΙΣΩ</button>
+  </div>
+
+  <!-- ══════════ STEP 3 — TEAM ══════════ -->
+  <div class="screen" id="step3">
+    <div class="screen-tag">▸ Αγαπημένη Ομάδα</div>
+    <div class="screen-title">Ποια<br>Ομάδα;</div>
+    <div class="screen-sub">Αυτή θα βλέπεις πρώτη. Μπορείς να αλλάξεις αργότερα.</div>
+
+    <div class="team-scroll">
+      <div class="option-grid cols-1" id="teamGrid">
+        <!-- Populated by JS based on country -->
+      </div>
+    </div>
+    <div class="sticky-cta">
+      <button class="cta" id="cta3" disabled onclick="nextStep()">ΣΥΝΕΧΕΙΑ →</button>
+      <button class="cta-secondary" onclick="prevStep()">← ΠΙΣΩ</button>
+    </div>
+  </div>
+
+  <!-- ══════════ STEP 4 — USERNAME ══════════ -->
+  <div class="screen" id="step4">
+    <div class="screen-tag">▸ Scout Identity</div>
+    <div class="screen-title">Το<br>Username σου</div>
+    <div class="screen-sub">Αυτό θα σε ξέρει η κοινότητα. Δεν αλλάζει εύκολα.</div>
+
+    <div class="input-wrap">
+      <span class="input-prefix">@</span>
+      <input
+        type="text"
+        class="username-input"
+        id="usernameInput"
+        placeholder="scout_gr"
+        maxlength="20"
+        oninput="validateUsername(this.value)"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+      >
+    </div>
+
+    <div class="validation-msg warn" id="validationMsg" style="display:none"></div>
+
+    <div class="rules-grid">
+      <div class="rule-item" id="rule-length"><div class="rule-dot"></div>3–20 χαρακτήρες</div>
+      <div class="rule-item" id="rule-start"><div class="rule-dot"></div>Αρχίζει με γράμμα</div>
+      <div class="rule-item" id="rule-chars"><div class="rule-dot"></div>a-z και _ μόνο</div>
+      <div class="rule-item" id="rule-numbers"><div class="rule-dot"></div>Έως 3 αριθμοί στο τέλος</div>
+    </div>
+
+    <button class="cta" id="cta4" disabled onclick="nextStep()">ΚΛΕΙΔΩΣΕ ΤΟ USERNAME →</button>
+    <button class="cta-secondary" onclick="prevStep()">← ΠΙΣΩ</button>
+  </div>
+
+  <!-- ══════════ STEP 5 — READY ══════════ -->
+  <div class="screen" id="step5">
+    <div class="screen-tag">▸ Όλα έτοιμα!</div>
+    <div class="screen-title">Καλωσόρισες<br><span id="welcomeName" style="color:var(--green)">Scout!</span></div>
+
+    <div class="scout-badge">
+      <div class="badge-circle">🧠</div>
+      <div class="badge-tier">⭐ TIER 1 SCOUT</div>
+      <div class="badge-sub">Ξεκινάς με 1.0x vote weight.<br>Όσο πιο accurate, τόσο πιο δυνατός.</div>
+    </div>
+
+    <div class="summary-card" id="summaryCard"></div>
+
+    <div class="coming-soon">
+      <span class="cs-chip">Scout Duels</span>
+      <span class="cs-chip">Fantasy League</span>
+      <span class="cs-chip">U21 Scouting</span>
+      <span class="cs-chip">Balkan Expansion</span>
+    </div>
+
+    <button class="cta" onclick="finish()">🚀 ΜΠΑΙΝΩ ΣΤΟ FANSCORE</button>
+  </div>
+
+</div><!-- end wrap -->
+
+<script>
+// ─── SUPABASE ───
+const { createClient } = supabase;
+const db = createClient(
+  'https://xszsyiqvznozidbhoowg.supabase.co',
+  'sb_publishable_b56eRu0nrBDvz93EzKHMEg_cRUoBx_3'
+);
+
+// ─── STATE ───
+const state = {
+  sport: 'football',
+  sportLabel: '⚽ Football',
+  sportId: null,
+  country: null,
+  countryLabel: null,
+  countryId: null,
+  team: null,
+  teamLabel: null,
+  teamId: null,
+  username: null,
+};
+
+let currentStep = 1;
+const totalSteps = 5;
+
+// ─── LOAD TEAMS FROM SUPABASE ───
+async function populateTeams(countryCode) {
+  const grid = document.getElementById('teamGrid');
+  grid.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:16px;text-align:center;">⏳ Φόρτωση...</div>';
+  document.getElementById('cta3').disabled = true;
+  state.team = null;
+
+  // Βρες country id
+  const { data: countryData } = await db
+    .from('countries')
+    .select('id')
+    .eq('code', countryCode.toUpperCase())
+    .single();
+
+  if (!countryData) {
+    grid.innerHTML = '<div style="color:var(--red);font-size:12px;padding:16px;text-align:center;">❌ Δεν βρέθηκαν ομάδες</div>';
+    return;
+  }
+
+  // Βρες teams για αυτή τη χώρα
+  const { data: teams, error } = await db
+    .from('teams')
+    .select('id, name, short_name')
+    .eq('country_id', countryData.id)
+    .eq('active', true)
+    .order('name');
+
+  if (error || !teams || teams.length === 0) {
+    grid.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:16px;text-align:center;">Δεν βρέθηκαν ομάδες</div>';
+    return;
+  }
+
+  grid.innerHTML = teams.map(t => `
+    <div class="option-card" style="--o-color:#00e676"
+      data-team-id="${t.id}"
+      data-team-name="${t.name.replace(/"/g,'&quot;')}"
+      data-team-short="${(t.short_name||'').replace(/"/g,'&quot;')}">
+      <div class="option-emoji">⚽</div>
+      <div class="option-info">
+        <div class="option-name">${t.name}</div>
+        <div class="option-sub">${t.short_name || ''}</div>
+      </div>
+      <div class="option-check"></div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.option-card').forEach(card => {
+    card.addEventListener('click', function() {
+      selectTeam(this.dataset.teamId, this.dataset.teamName, this.dataset.teamShort, this);
+    });
+  });
+}
+
+function selectTeam(id, name, short, el) {
+  state.team = id;
+  state.teamId = id;
+  state.teamLabel = '⚽ ' + name;
+
+  const grid = el.closest('.option-grid');
+  grid.querySelectorAll('.option-card').forEach(c => {
+    c.classList.remove('selected');
+    c.querySelector('.option-check').textContent = '';
+  });
+  el.classList.add('selected');
+  el.querySelector('.option-check').textContent = '✓';
+  document.getElementById('cta3').disabled = false;
+}
+
+// ─── SELECT OPTION ───
+function selectOption(type, value, label, el) {
+  state[type] = value;
+  state[type + 'Label'] = label;
+
+  const grid = el.closest('.option-grid');
+  grid.querySelectorAll('.option-card').forEach(c => {
+    c.classList.remove('selected');
+    c.querySelector('.option-check').textContent = '';
+  });
+  el.classList.add('selected');
+  el.querySelector('.option-check').textContent = '✓';
+
+  const ctaId = 'cta' + currentStep;
+  const cta = document.getElementById(ctaId);
+  if (cta) cta.disabled = false;
+
+  if (type === 'country') populateTeams(value);
+}
+
+// ─── USERNAME VALIDATION ───
+async function validateUsername(val) {
+  const msgEl = document.getElementById('validationMsg');
+  const cta = document.getElementById('cta4');
+
+  const rules = {
+    length: val.length >= 3 && val.length <= 20,
+    start: /^[a-z]/.test(val),
+    chars: /^[a-z_0-9]*$/.test(val),
+    numbers: /^[a-z][a-z_]{0,}[0-9]{0,3}$/.test(val) && !/[0-9].*[a-z_]/.test(val)
+  };
+
+  Object.entries(rules).forEach(([key, pass]) => {
+    const el = document.getElementById('rule-' + key);
+    if (!el) return;
+    el.className = 'rule-item ' + (val.length === 0 ? '' : pass ? 'pass' : 'fail');
+  });
+
+  const allPass = Object.values(rules).every(Boolean);
+  msgEl.style.display = val.length > 0 ? 'flex' : 'none';
+
+  if (val.length === 0) { cta.disabled = true; return; }
+
+  if (!allPass) {
+    if (val.length < 3) {
+      msgEl.className = 'validation-msg err';
+      msgEl.textContent = '✗ Πολύ μικρό — minimum 3 χαρακτήρες';
+    } else if (!/^[a-z]/.test(val)) {
+      msgEl.className = 'validation-msg err';
+      msgEl.textContent = '✗ Πρέπει να αρχίζει με γράμμα';
+    } else if (!/^[a-z_0-9]*$/.test(val)) {
+      msgEl.className = 'validation-msg err';
+      msgEl.textContent = '✗ Μόνο a-z, _ και αριθμοί';
+    } else {
+      msgEl.className = 'validation-msg warn';
+      msgEl.textContent = '⚠ Αριθμοί μόνο στο τέλος (max 3)';
+    }
+    cta.disabled = true;
+    return;
+  }
+
+  // Check αν υπάρχει ήδη στη βάση
+  msgEl.className = 'validation-msg warn';
+  msgEl.textContent = '⏳ Έλεγχος διαθεσιμότητας...';
+  cta.disabled = true;
+
+  const { data } = await db
+    .from('profiles')
+    .select('username')
+    .eq('username', val)
+    .maybeSingle();
+
+  if (data) {
+    msgEl.className = 'validation-msg err';
+    msgEl.textContent = '✗ @' + val + ' — χρησιμοποιείται ήδη';
+    cta.disabled = true;
+  } else {
+    msgEl.className = 'validation-msg ok';
+    msgEl.textContent = '✓ @' + val + ' — διαθέσιμο!';
+    cta.disabled = false;
+    state.username = val;
+  }
+}
+
+// ─── SAVE TO SUPABASE ───
+async function finish() {
+  const btn = document.querySelector('#step5 .cta');
+  btn.textContent = '⏳ Αποθήκευση...';
+  btn.disabled = true;
+
+  try {
+    const { data: { user } } = await db.auth.getUser();
+
+    if (!user) {
+      // Δεν είναι logged in — αποθήκευσε locally και redirect
+      localStorage.setItem('pendingOnboarding', JSON.stringify(state));
+      window.location.href = '/login.html';
+      return;
+    }
+
+    const { error } = await db.from('profiles').upsert({
+      id: user.id,
+      username: state.username,
+      fav_team_id: state.teamId,
+      fav_country_id: state.countryId,
+      tier: 1,
+      vote_weight: 1.0,
+    });
+
+    if (error) throw error;
+
+    // Επιτυχία → πήγαινε στο app
+    window.location.href = '/index.html';
+
+  } catch (err) {
+    btn.textContent = '🚀 ΜΠΑΙΝΩ ΣΤΟ FANSCORE';
+    btn.disabled = false;
+    showToast('❌ Σφάλμα: ' + err.message);
+  }
+}
+
+// ─── NAVIGATION ───
+function nextStep() {
+  if (currentStep < totalSteps) {
+    document.getElementById('step' + currentStep).classList.remove('active');
+    currentStep++;
+    document.getElementById('step' + currentStep).classList.add('active');
+    updateProgress();
+    if (currentStep === 5) buildSummary();
+  }
+}
+
+function prevStep() {
+  if (currentStep > 1) {
+    document.getElementById('step' + currentStep).classList.remove('active');
+    currentStep--;
+    document.getElementById('step' + currentStep).classList.add('active');
+    updateProgress();
+  }
+}
+
+function updateProgress() {
+  document.getElementById('stepNum').textContent = currentStep;
+  document.getElementById('progressFill').style.width = (currentStep / totalSteps * 100) + '%';
+}
+
+function buildSummary() {
+  document.getElementById('welcomeName').textContent = '@' + (state.username || 'Scout') + '!';
+  document.getElementById('summaryCard').innerHTML = `
+    <div class="summary-row">
+      <div class="summary-icon">🏅</div>
+      <div class="summary-key">Username</div>
+      <div class="summary-val" style="color:var(--green)">@${state.username}</div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-icon">⚽</div>
+      <div class="summary-key">Sport</div>
+      <div class="summary-val">${state.sportLabel.split(' ').slice(1).join(' ')}</div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-icon">${(state.countryLabel||'').split(' ')[0]}</div>
+      <div class="summary-key">Χώρα</div>
+      <div class="summary-val">${(state.countryLabel||'—').split(' ').slice(1).join(' ')}</div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-icon">⚽</div>
+      <div class="summary-key">Ομάδα</div>
+      <div class="summary-val">${(state.teamLabel||'—').split(' ').slice(1).join(' ')}</div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-icon">⭐</div>
+      <div class="summary-key">Scout Tier</div>
+      <div class="summary-val" style="color:var(--gold)">Tier 1 · 1.0x weight</div>
+    </div>
+  `;
+}
+
+function showComingSoon() {
+  showToast('⏳ Σύντομα διαθέσιμο!');
+}
+
+function showToast(msg) {
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0f1320;border:1px solid var(--gold);color:var(--gold);font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;padding:11px 22px;z-index:999;white-space:nowrap;';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2500);
+}
+</script>
+</body>
+</html>
