@@ -30,12 +30,11 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: 'Barlow', sans-serif;
-  height: 100vh;
-  max-height: 100vh;
+  min-height: 100vh; /* Αλλαγή από height: 100vh */
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Για να μην κεντράρει τα πάντα και κρύβει την κορυφή */
   justify-content: center;
-  overflow: hidden;
+  overflow-y: auto; /* Επιτρέπουμε το scroll στο κινητό */
 }
 
 
@@ -62,14 +61,13 @@ body::after {
 .wrap {
   width: 100%;
   max-width: 480px;
-  height: 100vh;
-  max-height: 100vh;
+  min-height: 100vh; /* Αλλαγή από height: 100vh */
   display: flex;
   flex-direction: column;
   position: relative;
   z-index: 1;
-  padding: 0 0 40px;
-  overflow: hidden;
+  padding: 0 0 20px;
+  overflow: visible; /* Ξεκλειδώνουμε το περιεχόμενο */
 }
 
 /* ─── TOP BAR ─── */
@@ -370,6 +368,17 @@ body::after {
   font-weight: 700; letter-spacing: .1em;
   padding: 4px 10px; border: 1px solid var(--border); color: var(--muted);
   opacity: .5;
+}
+#step5 {
+  padding-bottom: 120px !important;
+}
+
+#step5 .cta {
+  position: sticky;
+  bottom: 20px;
+  z-index: 999;
+  background: var(--green);
+  box-shadow: 0 -10px 25px rgba(0,0,0,0.5);
 }
 </style>
 </head>
