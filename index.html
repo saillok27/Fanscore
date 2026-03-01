@@ -446,8 +446,12 @@ Engine.db = db;
 // ═══════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════
-let currentUser = null;
-let currentProfile = null;
+// ── Βήμα 1β: State aliases ──────────────────────────────────
+// currentUser / currentProfile είναι read-only getters.
+// Διαβάζουν αποκλειστικά από State — ένα canonical object.
+// Κανένας κώδικας δεν γράφει απευθείας σε αυτές.
+Object.defineProperty(window, 'currentUser',    { get() { return State.user;    }, configurable: true });
+Object.defineProperty(window, 'currentProfile', { get() { return State.profile; }, configurable: true });
 let currentPlayer = null;
 let prevPage = 'page-home';
 let allPlayers = [];
@@ -477,8 +481,6 @@ async function skipLogin() {
 
 async function logout() {
   await db.auth.signOut();
-  currentUser = null;
-  currentProfile = null;
   State.user = null;
   State.profile = null;
   document.getElementById('loginScreen').style.display = 'flex';
@@ -490,7 +492,6 @@ async function logout() {
 async function initAuth() {
   const { data: { session } } = await db.auth.getSession();
   if (session) {
-    currentUser = session.user;
     State.user = session.user;
     await loadProfile();
     // Αν δεν έχει ολοκληρώσει onboarding → redirect
@@ -507,7 +508,7 @@ async function initAuth() {
 
   db.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session) {
-      currentUser = session.user;
+      State.user = session.user;
       await loadProfile();
       // Αν δεν έχει ολοκληρώσει onboarding → redirect
       if (!currentProfile?.fav_team_id) {
@@ -538,7 +539,6 @@ async function loadProfile() {
     }).select().single();
     data = newProfile;
   }
-  currentProfile = data;
   State.profile = data;
   updateProfileUI();
 }
@@ -781,8 +781,7 @@ async function submitVote() {
 
   if (!result.ok) { showToast('❌ Σφάλμα: ' + result.reason); return; }
 
-  // Sync local ref από State (Engine ενημέρωσε State.profile.xp)
-  if (currentProfile) currentProfile.xp = State.profile.xp;
+  // currentProfile είναι getter → State.profile. Δεν χρειάζεται manual sync.
   updateProfileUI();
 
   showToast('⚡ +' + result.xp + ' XP ΚΕΡΔΙΣΕΣ!');
