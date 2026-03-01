@@ -1,35 +1,81 @@
 const Engine = {
+
+  // db inject από index.html αμέσως μετά το createClient()
+  db: null,
+
   async dispatch(action, payload = {}) {
+
+    // 🛡️ Guard #1 — db not injected
+    if (!Engine.db) {
+      throw new Error('[Engine] db not initialized. Call Engine.db = db before dispatch.');
+    }
+
+    // 🛡️ Guard #2 — user not authenticated
+    if (!State.user) {
+      console.error('[Engine] dispatch called without authenticated user.');
+      return { ok: false, reason: 'NOT_AUTHENTICATED' };
+    }
+
     const phase = State.phase();
 
-    // 🔒 Δικαιώματα ψήφου
-    if (action === "VOTE_PLAYER" || action === "H2H_VOTE") {
+    // 🔒 Έλεγχος δικαιωμάτων ψήφου
+    if (action === 'VOTE_PLAYER') {
       if (!World.canVote(phase)) {
-        console.error("❌ Δεν επιτρέπεται vote. Phase:", phase);
-        return { ok: false, reason: "PHASE_LOCKED" };
+        console.error('❌ Δεν επιτρέπεται vote. Phase:', phase);
+        return { ok: false, reason: 'PHASE_LOCKED' };
       }
     }
 
-    // 🎁 XP υπολογισμός
+    // ── H2H_VOTE — DISABLED ──────────────────────────────────
+    // H2H moved to future game environment.
+    // Engine will not process H2H_VOTE. No writes. No XP.
+    if (action === 'H2H_VOTE') {
+      console.warn('[Engine] H2H_VOTE is disabled. No action taken.');
+      return { ok: false, reason: 'H2H_DISABLED' };
+    }
+
+    // ── VOTE_PLAYER ──────────────────────────────────────────
+    if (action === 'VOTE_PLAYER') {
+      const { playerId, score } = payload;
+
+      if (!playerId || score === undefined) {
+        return { ok: false, reason: 'INVALID_PAYLOAD' };
+      }
+
+      const { error } = await Engine.db
+        .from('votes')
+        .upsert(
+          { player_id: playerId, user_id: State.user.id, score },
+          { onConflict: 'player_id,user_id' }
+        );
+
+      if (error) {
+        console.error('❌ Vote error:', error.message);
+        return { ok: false, reason: error.message };
+      }
+    }
+
+    // ── XP ───────────────────────────────────────────────────
+    // Υπολογίζεται μία φορά και επαναχρησιμοποιείται.
+    // Μόνο VOTE_PLAYER φτάνει εδώ — H2H επιστρέφει νωρίτερα.
     const xp = World.xpFor(action);
 
-    // 💾 XP persistence (Engine owns it)
-    if (xp > 0 && State.user) {
+    if (xp > 0) {
       const newXP = (State.profile?.xp || 0) + xp;
 
-      const { error } = await db
+      const { error: xpError } = await Engine.db
         .from('profiles')
         .update({ xp: newXP })
         .eq('id', State.user.id);
 
-      if (!error && State.profile) {
+      if (!xpError && State.profile) {
         State.profile.xp = newXP;
+      } else if (xpError) {
+        console.error('❌ XP update error:', xpError.message);
       }
     }
 
-    return {
-      ok: true,
-      xp
-    };
+    // xp υπολογίστηκε μία φορά παραπάνω — επιστρέφεται η ίδια τιμή
+    return { ok: true, xp };
   }
 };

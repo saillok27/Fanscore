@@ -3,42 +3,14 @@ const State = {
   profile: null,
 
   phase() {
-    if (!this.user) return 0;                 // όχι login
-    if (!this.profile?.favorite_team) return 1; // login, χωρίς ομάδα
-    return 2;                                 // login + ομάδα
+    if (!this.user) return 0;                    // Phase 0: όχι login
+    if (!this.profile?.fav_team_id) return 1;    // Phase 1: login, χωρίς ομάδα
+    return 2;                                    // Phase 2: login + ομάδα
   }
 };
-// ===============================
-// NICKNAME
-// ===============================
 
-function submitNickname() {
-  const input = document.getElementById('nicknameInput');
-  const errorEl = document.getElementById('nicknameError');
-
-  if (!input) return;
-
-  const nickname = input.value.trim();
-
-  // regex: μικρά γράμματα, _, 3 αριθμοί στο τέλος
-  const regex = /^[a-z][a-z_]{1,16}[0-9]{0,3}$/;
-
-  if (!regex.test(nickname)) {
-    errorEl.textContent =
-      'Μόνο μικρά γράμματα, "_" και έως 3 αριθμοί στο τέλος';
-    return;
-  }
-
-  errorEl.textContent = '';
-
-  console.log('✅ Nickname OK:', nickname);
-
-  // ΠΡΟΣΩΡΙΝΑ (μέχρι DB)
-  State.profile.nickname = nickname;
-
-  // κλείσε nickname screen
-  document.getElementById('nicknameScreen').style.display = 'none';
-
-  // άνοιξε onboard (ομάδα)
-  document.getElementById('onboardScreen').style.display = 'block';
-}
+// ── Σημείωση αρχιτεκτονικής ─────────────────────────────────
+// State.user  → set από index.html μετά από κάθε login/logout
+// State.profile → set από index.html μετά από loadProfile()
+// Το State δεν περιέχει UI logic. Δεν αναφέρεται σε DOM.
+// ─────────────────────────────────────────────────────────────

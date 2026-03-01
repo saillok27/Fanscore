@@ -10,6 +10,10 @@
 
 <!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Core modules — σειρά φόρτωσης: world → state → engine -->
+<script src="js/state.js"></script>
+<script src="js/world.js"></script>
+<script src="js/engine.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;800;900&display=swap" rel="stylesheet"/>
 <style>
@@ -436,6 +440,9 @@ const SUPABASE_ANON_KEY = 'sb_publishable_b56eRu0nrBDvz93EzKHMEg_cRUoBx_3';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ── Engine injection ────────────────────────────────────────
+Engine.db = db;
+
 // ═══════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════
@@ -472,6 +479,8 @@ async function logout() {
   await db.auth.signOut();
   currentUser = null;
   currentProfile = null;
+  State.user = null;
+  State.profile = null;
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('mainHeader').style.display = 'none';
   document.getElementById('mainNav').style.display = 'none';
@@ -482,6 +491,7 @@ async function initAuth() {
   const { data: { session } } = await db.auth.getSession();
   if (session) {
     currentUser = session.user;
+    State.user = session.user;
     await loadProfile();
     // Αν δεν έχει ολοκληρώσει onboarding → redirect
     if (!currentProfile?.fav_team_id) {
@@ -529,6 +539,7 @@ async function loadProfile() {
     data = newProfile;
   }
   currentProfile = data;
+  State.profile = data;
   updateProfileUI();
 }
 
@@ -657,24 +668,21 @@ function renderAllPlayers() {
 }
 
 function renderH2H() {
-  const eligible = allPlayers.filter(p => p.voteCount > 0);
-  if (eligible.length < 2) {
-    document.getElementById('h2hContent').innerHTML = '<div class="loading">Χρειάζονται περισσότερες ψήφοι για H2H</div>';
-    return;
-  }
-  const shuffle = [...eligible].sort(() => Math.random() - 0.5);
-  const p1 = shuffle[0], p2 = shuffle[1];
+  // H2H deactivated — moved to future game environment.
+  // No data read. No interaction. Zero dataset impact.
   document.getElementById('h2hContent').innerHTML = `
     <div class="h2h-card">
-      <div class="h2h-top"><div class="h2h-tag">H2H</div><div class="h2h-q">Ποιος είναι καλύτερος;</div></div>
-      <div class="h2h-arena">
-        <div class="h2h-p"><div class="h2h-av a">${p1.avatar}</div><div class="h2h-pname">${p1.name.split(' ').pop()}</div><div class="h2h-pteam">${p1.team}</div></div>
-        <div class="h2h-vs">VS</div>
-        <div class="h2h-p"><div class="h2h-av b">${p2.avatar}</div><div class="h2h-pname">${p2.name.split(' ').pop()}</div><div class="h2h-pteam">${p2.team}</div></div>
+      <div class="h2h-top">
+        <div class="h2h-tag">H2H</div>
+        <div class="h2h-q">Σύντομα διαθέσιμο</div>
       </div>
-      <div class="h2h-actions">
-        <div class="h2h-btn" onclick="doH2H('${p1.id}','${p1.name}')">👈 ${p1.name.split(' ').pop().toUpperCase()}</div>
-        <div class="h2h-btn" onclick="doH2H('${p2.id}','${p2.name}')">ΕΠΟΜΕΝΟ 👉</div>
+      <div class="h2h-arena" style="opacity:0.3;pointer-events:none;filter:blur(2px);">
+        <div class="h2h-p"><div class="h2h-av a" style="font-size:28px;">?</div><div class="h2h-pname">—</div></div>
+        <div class="h2h-vs">VS</div>
+        <div class="h2h-p"><div class="h2h-av b" style="font-size:28px;">?</div><div class="h2h-pname">—</div></div>
+      </div>
+      <div style="text-align:center;padding:16px 14px;font-family:'Rajdhani',sans-serif;font-size:12px;color:var(--txt3);letter-spacing:1px;border-top:1px solid var(--border2);">
+        ⚔️ COMING SOON — GAME ENVIRONMENT
       </div>
     </div>`;
 }
@@ -766,36 +774,31 @@ async function submitVote() {
 
   if (!currentUser) { showToast('🔒 Συνδέσου για να ψηφίσεις!'); return; }
 
-  const { error } = await db.from('votes').upsert({
-    player_id: currentPlayer.id,
-    user_id: currentUser.id,
+  const result = await Engine.dispatch('VOTE_PLAYER', {
+    playerId: currentPlayer.id,
     score: score
-  }, { onConflict: 'player_id,user_id' });
+  });
 
-  if (error) { showToast('❌ Σφάλμα: ' + error.message); return; }
+  if (!result.ok) { showToast('❌ Σφάλμα: ' + result.reason); return; }
 
-  // Add XP
-  const newXP = (currentProfile?.xp || 0) + 5;
-  await db.from('profiles').update({ xp: newXP }).eq('id', currentUser.id);
-  if (currentProfile) currentProfile.xp = newXP;
+  // Sync local ref από State (Engine ενημέρωσε State.profile.xp)
+  if (currentProfile) currentProfile.xp = State.profile.xp;
   updateProfileUI();
 
-  showToast('⚡ +5 XP ΚΕΡΔΙΣΕΣ!');
+  showToast('⚡ +' + result.xp + ' XP ΚΕΡΔΙΣΕΣ!');
   await loadPlayers();
   gotoPage(prevPage);
 }
 
-async function doH2H(playerId, playerName) {
-  if (!currentUser) { showToast('🔒 Συνδέσου για να ψηφίσεις!'); return; }
-  const score = Math.floor(Math.random() * 20) + 70;
-  await db.from('votes').upsert({ player_id: playerId, user_id: currentUser.id, score }, { onConflict: 'player_id,user_id' });
-  const newXP = (currentProfile?.xp || 0) + 8;
-  await db.from('profiles').update({ xp: newXP }).eq('id', currentUser.id);
-  if (currentProfile) currentProfile.xp = newXP;
-  updateProfileUI();
-  showToast(`✅ ${playerName.split(' ').pop()} — +8 XP`);
-  await loadPlayers();
-  renderH2H();
+// ═══════════════════════════════════════
+// H2H — DISABLED (moved to future game environment)
+// Zero writes to votes table. Zero XP impact.
+// UI structure preserved for future activation.
+// ═══════════════════════════════════════
+function doH2H(playerId, playerName) {
+  // H2H vote logic is deactivated.
+  // No DB write. No XP. No Engine.dispatch.
+  return;
 }
 
 // ═══════════════════════════════════════
