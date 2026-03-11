@@ -42,40 +42,20 @@ const Engine = {
         return { ok: false, reason: 'INVALID_PAYLOAD' };
       }
 
-      const { error } = await Engine.db
-        .from('votes')
-        .upsert(
-          { player_id: playerId, user_id: State.user.id, score },
-          { onConflict: 'player_id,user_id' }
-        );
+      const { data, error } = await Engine.db
+        .rpc('cast_vote', {
+          p_player_id: playerId,
+          p_score: score
+        });
 
       if (error) {
-        console.error('❌ Vote error:', error.message);
+        console.error('❌ cast_vote error:', error.message);
         return { ok: false, reason: error.message };
       }
+
+      return data;
     }
 
-    // ── XP ───────────────────────────────────────────────────
-    // Υπολογίζεται μία φορά και επαναχρησιμοποιείται.
-    // Μόνο VOTE_PLAYER φτάνει εδώ — H2H επιστρέφει νωρίτερα.
-    const xp = World.xpFor(action);
-
-    if (xp > 0) {
-      const newXP = (State.profile?.xp || 0) + xp;
-
-      const { error: xpError } = await Engine.db
-        .from('profiles')
-        .update({ xp: newXP })
-        .eq('id', State.user.id);
-
-      if (!xpError && State.profile) {
-        State.profile.xp = newXP;
-      } else if (xpError) {
-        console.error('❌ XP update error:', xpError.message);
-      }
-    }
-
-    // xp υπολογίστηκε μία φορά παραπάνω — επιστρέφεται η ίδια τιμή
-    return { ok: true, xp };
+    return { ok: false, reason: 'UNKNOWN_ACTION' };
   }
 };
