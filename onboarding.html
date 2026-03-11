@@ -769,14 +769,14 @@ async function finish() {
       return;
     }
 
-    const { error } = await db.from('profiles').upsert({
-      id: user.id,
-      username: state.username,
-      fav_team_id: state.teamId,
-      fav_country_id: state.countryId,
-      tier: 1,
-      vote_weight: 1.0,
-    });
+   const { error } = await db.from('profiles').upsert({
+  id: user.id,
+  username: state.username,
+  fav_team_id: state.teamId,
+  fav_country_id: state.countryId,
+  tier: 1,
+  // vote_weight: 1.0,  ← ΑΦΑΙΡΕΘΗΚΕ — server-side only
+});
 
     if (error) throw error;
 
