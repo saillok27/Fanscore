@@ -27,8 +27,6 @@ const Engine = {
     }
 
     // ── H2H_VOTE — DISABLED ──────────────────────────────────
-    // H2H moved to future game environment.
-    // Engine will not process H2H_VOTE. No writes. No XP.
     if (action === 'H2H_VOTE') {
       console.warn('[Engine] H2H_VOTE is disabled. No action taken.');
       return { ok: false, reason: 'H2H_DISABLED' };
@@ -36,17 +34,30 @@ const Engine = {
 
     // ── VOTE_PLAYER ──────────────────────────────────────────
     if (action === 'VOTE_PLAYER') {
-      const { playerId, score } = payload;
+      const {
+        playerId,
+        score,
+        matchId       = null,
+        exposureLevel = null,
+        attributeTag  = null,
+        confidence    = null,
+        biasDeclared  = null
+      } = payload;
 
       if (!playerId || score === undefined) {
         return { ok: false, reason: 'INVALID_PAYLOAD' };
       }
 
-      const { data, error } = await Engine.db
-        .rpc('cast_vote', {
-          p_player_id: playerId,
-          p_score: score
-        });
+      // Build RPC params — only include optional fields if provided.
+      // cast_vote() uses DEFAULT NULL + COALESCE, so omitting preserves existing values.
+      const rpcParams = { p_player_id: playerId, p_score: score };
+      if (matchId       !== null) rpcParams.p_match_id       = matchId;
+      if (exposureLevel !== null) rpcParams.p_exposure_level = exposureLevel;
+      if (attributeTag  !== null) rpcParams.p_attribute_tag  = attributeTag;
+      if (confidence    !== null) rpcParams.p_confidence     = confidence;
+      if (biasDeclared  !== null) rpcParams.p_bias_declared  = biasDeclared;
+
+      const { data, error } = await Engine.db.rpc('cast_vote', rpcParams);
 
       if (error) {
         console.error('❌ cast_vote error:', error.message);

@@ -414,6 +414,166 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   letter-spacing:2px;cursor:pointer;transition:background 0.2s;}
 .logout-btn:active{background:rgba(255,61,87,0.1);}
 
+/* ═══════════════ CONFIDENCE LEVEL (2.5) ═══════════════ */
+.rev-conf-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:10px;
+  letter-spacing:2px;text-transform:uppercase;color:var(--txt3);
+  margin-bottom:8px;text-align:center;}
+.conf-dots{display:flex;justify-content:center;gap:10px;}
+.conf-dot{width:36px;height:36px;border-radius:50%;
+  background:var(--bg3);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .15s;
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:var(--txt3);}
+.conf-dot:active{transform:scale(0.92);}
+.conf-dot.selected{background:rgba(77,168,255,0.12);
+  border-color:rgba(77,168,255,0.4);color:var(--blue);}
+.conf-skip{text-align:center;font-size:10px;color:var(--txt3);
+  cursor:pointer;margin-top:6px;font-family:'Rajdhani',sans-serif;letter-spacing:0.5px;}
+.conf-skip:active{color:var(--txt2);}
+
+/* ═══════════════ ATTRIBUTE TAG (2.3) ═══════════════ */
+.rev-tag-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:10px;
+  letter-spacing:2px;text-transform:uppercase;color:var(--txt3);
+  margin-bottom:8px;text-align:center;}
+.rev-tag-options{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.tag-btn{padding:8px 4px;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:7px;cursor:pointer;text-align:center;transition:all .15s;}
+.tag-btn:active{transform:scale(0.97);}
+.tag-btn.selected{background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.35);}
+.tag-btn-ico{font-size:14px;margin-bottom:2px;}
+.tag-btn-lbl{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:9px;
+  letter-spacing:0.5px;color:var(--txt2);text-transform:uppercase;}
+.tag-btn.selected .tag-btn-lbl{color:var(--purple);}
+.tag-skip{text-align:center;font-size:10px;color:var(--txt3);
+  cursor:pointer;margin-top:6px;font-family:'Rajdhani',sans-serif;letter-spacing:0.5px;}
+.tag-skip:active{color:var(--txt2);}
+
+/* ═══════════════ REVELATION SCREEN (2.4) ═══════════════ */
+.revelation-overlay{position:fixed;inset:0;z-index:250;
+  background:rgba(6,8,16,0.96);backdrop-filter:blur(16px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;gap:0;}
+.revelation-inner{width:100%;max-width:400px;display:flex;flex-direction:column;
+  align-items:center;gap:20px;}
+.rev-player-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;
+  letter-spacing:3px;text-transform:uppercase;color:var(--txt3);}
+.rev-your-score-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.rev-your-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:10px;
+  letter-spacing:2px;color:var(--txt3);text-transform:uppercase;}
+.rev-your-score{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:80px;
+  color:var(--teal);line-height:1;text-shadow:0 0 40px var(--teal-glow);
+  animation:scoreReveal 0.5s cubic-bezier(0.16,1,0.3,1) both;}
+.rev-divider{width:100%;height:1px;background:var(--border2);}
+.rev-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;}
+.rev-stat{background:var(--bg2);border:1px solid var(--border2);
+  border-radius:10px;padding:12px 8px;text-align:center;}
+.rev-stat-val{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:22px;
+  color:var(--teal);line-height:1;}
+.rev-stat-lbl{font-size:9px;color:var(--txt3);letter-spacing:1px;
+  text-transform:uppercase;margin-top:3px;}
+.rev-stat.highlight{border-color:var(--teal3);background:var(--teal-dim);}
+.rev-stat.highlight .rev-stat-val{color:var(--teal);}
+/* Attribute tag section — populated in 2.3 */
+.rev-tag-section{width:100%;}
+/* Confidence section — populated in 2.5 */
+.rev-conf-section{width:100%;}
+.rev-continue-btn{width:100%;padding:14px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:8px;
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;
+  letter-spacing:2px;text-transform:uppercase;color:var(--txt2);
+  cursor:pointer;transition:all .15s;}
+.rev-continue-btn:active{border-color:var(--teal3);color:var(--teal);}
+
+/* ═══════════════ EXPOSURE LEVEL (2.2) ═══════════════ */
+.exposure-wrap{margin-bottom:14px;}
+.exposure-label{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:10px;
+  letter-spacing:2px;text-transform:uppercase;color:var(--txt3);margin-bottom:8px;}
+.exposure-options{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+.exp-btn{padding:8px 6px;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:7px;cursor:pointer;text-align:center;transition:all .15s;}
+.exp-btn:active{transform:scale(0.97);}
+.exp-btn.selected{background:var(--teal-dim);border-color:var(--teal3);}
+.exp-btn-ico{font-size:16px;margin-bottom:2px;}
+.exp-btn-lbl{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:10px;
+  letter-spacing:0.5px;color:var(--txt2);}
+.exp-btn.selected .exp-btn-lbl{color:var(--teal);}
+
+/* ═══════════════ MATCH CONTEXT (2.1) ═══════════════ */
+.match-context{display:flex;align-items:center;gap:10px;
+  background:rgba(77,168,255,0.06);border:1px solid rgba(77,168,255,0.18);
+  border-radius:8px;padding:9px 12px;margin-bottom:12px;}
+.match-context-ico{font-size:16px;flex-shrink:0;}
+.match-context-body{flex:1;min-width:0;}
+.match-context-teams{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;
+  letter-spacing:0.5px;color:var(--txt);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;}
+.match-context-meta{font-size:10px;color:var(--txt3);margin-top:1px;letter-spacing:0.3px;}
+.match-context-badge{flex-shrink:0;}
+.match-live-badge{display:inline-flex;align-items:center;gap:4px;
+  background:rgba(255,61,87,0.12);border:1px solid rgba(255,61,87,0.3);
+  border-radius:4px;padding:2px 7px;
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:9px;
+  letter-spacing:1.5px;color:var(--red);}
+.match-scheduled-badge{display:inline-flex;align-items:center;
+  background:rgba(77,168,255,0.1);border:1px solid rgba(77,168,255,0.25);
+  border-radius:4px;padding:2px 7px;
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:9px;
+  letter-spacing:1px;color:var(--blue);}
+
+/* ═══════════════ REVISION WINDOW (1.2) ═══════════════ */
+.revision-wrap{display:flex;align-items:center;justify-content:space-between;
+  background:rgba(0,240,200,0.04);border:1px solid rgba(0,240,200,0.12);
+  border-radius:8px;padding:8px 12px;margin-bottom:12px;}
+.revision-info{font-size:11px;color:var(--txt2);line-height:1.5;}
+.revision-info strong{color:var(--teal);font-family:'Rajdhani',sans-serif;font-weight:700;}
+.revision-countdown{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;
+  color:var(--teal);flex-shrink:0;min-width:42px;text-align:right;
+  transition:color 0.3s;}
+.revision-countdown.urgent{color:var(--gold);}
+.revision-countdown.expired{color:var(--txt3);}
+.revision-expired-msg{background:rgba(255,255,255,0.03);border:1px solid var(--border2);
+  border-radius:8px;padding:10px 12px;margin-bottom:12px;
+  font-size:11px;color:var(--txt3);line-height:1.6;text-align:center;
+  font-family:'Rajdhani',sans-serif;letter-spacing:0.3px;}
+
+/* ═══════════════ TOS MODAL (1.3) ═══════════════ */
+.tos-overlay{position:fixed;inset:0;z-index:300;background:rgba(6,8,16,0.92);
+  backdrop-filter:blur(12px);display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:env(safe-area-inset-bottom,0);}
+.tos-sheet{width:100%;max-width:500px;background:var(--bg2);
+  border-top:1px solid var(--border);border-radius:16px 16px 0 0;
+  padding:24px 20px 32px;display:flex;flex-direction:column;gap:16px;
+  animation:sheetUp 0.3s cubic-bezier(0.16,1,0.3,1) both;}
+@keyframes sheetUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.tos-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--txt);}
+.tos-body{font-size:12px;color:var(--txt2);line-height:1.7;
+  max-height:160px;overflow-y:auto;
+  border:1px solid var(--border2);border-radius:8px;padding:12px 14px;
+  background:var(--bg1);}
+.tos-body strong{color:var(--txt);font-weight:600;}
+.tos-check-row{display:flex;align-items:flex-start;gap:12px;cursor:pointer;}
+.tos-checkbox{width:20px;height:20px;flex-shrink:0;border-radius:4px;
+  border:2px solid var(--teal3);background:transparent;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;margin-top:1px;}
+.tos-checkbox.checked{background:var(--teal);border-color:var(--teal);}
+.tos-checkbox.checked::after{content:'✓';color:var(--bg0);font-weight:700;font-size:13px;}
+.tos-check-label{font-size:13px;color:var(--txt2);line-height:1.5;
+  font-family:'Rajdhani',sans-serif;font-weight:600;}
+.tos-check-label a{color:var(--teal);text-decoration:none;}
+.tos-accept-btn{width:100%;padding:14px;
+  background:linear-gradient(90deg,var(--teal3),var(--teal));
+  border:none;border-radius:8px;font-family:'Rajdhani',sans-serif;font-weight:700;
+  font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--bg0);
+  cursor:pointer;box-shadow:0 4px 18px var(--teal-glow);
+  transition:opacity 0.2s,transform 0.15s;}
+.tos-accept-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.tos-accept-btn:not(:disabled):active{transform:scale(0.98);}
+.tos-cancel{text-align:center;font-size:11px;color:var(--txt3);
+  cursor:pointer;font-family:'Rajdhani',sans-serif;letter-spacing:0.5px;}
+.tos-cancel:active{color:var(--txt2);}
+
 /* ═══════════════ TOAST ═══════════════ */
 .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
   background:var(--teal);color:var(--bg0);font-family:'Rajdhani',sans-serif;
@@ -441,6 +601,49 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .empty-state{text-align:center;padding:40px 20px;color:var(--txt3);
   font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:1px;}
 .empty-state .empty-ico{font-size:32px;margin-bottom:10px;opacity:0.4;}
+
+/* ═══════════════ STATUS BADGES ═══════════════ */
+.status-badge{display:inline-flex;align-items:center;gap:5px;
+  border-radius:4px;padding:2px 8px;
+  font-family:'Rajdhani',sans-serif;font-weight:700;font-size:10px;letter-spacing:1.5px;}
+.status-badge.emerging{
+  background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:var(--purple);}
+.status-badge.unrated-first{
+  background:rgba(0,240,200,0.07);border:1px solid rgba(0,240,200,0.2);color:var(--teal);
+  animation:pulseGlow 2.5s ease infinite;}
+@keyframes pulseGlow{0%,100%{box-shadow:none;}50%{box-shadow:0 0 10px rgba(0,240,200,0.2);}}
+
+/* ═══════════════ PRE-VOTE CONCEALMENT (1.1) ═══════════════ */
+.score-concealed{
+  font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--txt3);
+  letter-spacing:2px;opacity:0.5;}
+.vote-to-reveal{
+  background:rgba(0,240,200,0.06);border:1px solid rgba(0,240,200,0.15);
+  border-radius:8px;padding:10px 14px;margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;}
+.vtr-icon{font-size:20px;flex-shrink:0;}
+.vtr-text{font-size:12px;color:var(--txt2);line-height:1.5;}
+.vtr-text strong{color:var(--teal);font-family:'Rajdhani',sans-serif;
+  font-weight:700;letter-spacing:0.5px;}
+@keyframes scoreReveal{
+  0%{opacity:0;transform:scale(0.7);}
+  60%{transform:scale(1.08);}
+  100%{opacity:1;transform:scale(1);}}
+.score-revealed{animation:scoreReveal 0.5s cubic-bezier(0.16,1,0.3,1) both;}
+
+/* Low confidence indicator for emerging players */
+.conf-dots{display:flex;gap:3px;margin-top:3px;}
+.conf-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.1);}
+.conf-dot.filled{background:var(--purple);}
+
+/* Unrated player prompt */
+.unrated-prompt{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px 16px;gap:8px;text-align:center;}
+.unrated-ico{font-size:36px;opacity:0.5;}
+.unrated-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:2px;text-transform:uppercase;color:var(--teal);}
+.unrated-sub{font-size:11px;color:var(--txt3);line-height:1.6;}
 </style>
 </head>
 <body>
@@ -468,13 +671,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <div class="hdr" id="mainHeader" style="display:none;">
   <div class="hdr-inner">
     <div class="logo">FAN<em>SCORE</em></div>
-    <div class="hdr-mid">
-      <div class="xp-bar-wrap">
-        <div class="level-badge" id="levelBadge">BRONZE</div>
-        <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
-        <div class="xp-count" id="xpCount">0 XP</div>
-      </div>
-    </div>
+    <div class="hdr-mid"></div>
     <div class="streak-pill">🔥<span id="streakN">0</span></div>
   </div>
 </div>
@@ -496,7 +693,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <div class="quest-desc">Βαθμολόγησε 5 παίκτες σήμερα</div>
         <div class="quest-progress"><div class="quest-progress-fill" id="questFill" style="width:0%"></div></div>
       </div>
-      <div class="quest-reward">+20<span>XP</span></div>
+      <div class="quest-reward">🎯<span>ΣΚΟΠΟΣ</span></div>
     </div>
 
     <!-- STATS BAR -->
@@ -591,6 +788,38 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <span class="my-vote-tag" id="myVoteTag" style="display:none;"></span>
       </div>
       <div class="vote-panel-body">
+        <!-- Match context banner (2.1) — shown when active match exists -->
+        <div id="matchContextWrap" style="display:none;">
+          <div class="match-context">
+            <div class="match-context-ico">⚽</div>
+            <div class="match-context-body">
+              <div class="match-context-teams" id="matchContextTeams">—</div>
+              <div class="match-context-meta" id="matchContextMeta">—</div>
+            </div>
+            <div class="match-context-badge" id="matchContextBadge"></div>
+          </div>
+        </div>
+        <!-- Bias indicator (2.6) — shown when player is from user's favorite team -->
+        <div id="biasIndicatorWrap" style="display:none;">
+          <div style="font-size:10px;color:var(--txt3);letter-spacing:1px;
+            font-family:'Rajdhani',sans-serif;font-weight:700;margin-bottom:8px;
+            text-align:center;">🏠 Ψηφίζεις παίκτη της ομάδας σου</div>
+        </div>
+        <!-- Vote-to-reveal prompt: shown for emerging/established players before user votes (1.1) -->
+        <div id="voteToRevealWrap" class="vote-to-reveal" style="display:none;">
+          <div class="vtr-icon">🔍</div>
+          <div class="vtr-text">Το score είναι κρυφό μέχρι να ψηφίσεις.<br><strong>Ψήφισε πρώτα</strong> — μετά βλέπεις.</div>
+        </div>
+        <!-- Revision window: shown only after user has voted (1.2) -->
+        <div id="revisionWrap" style="display:none;">
+          <div class="revision-wrap">
+            <div class="revision-info">Μπορείς να αλλάξεις την ψήφο σου<br><strong>εντός 5 λεπτών</strong></div>
+            <div class="revision-countdown" id="revisionCountdown">5:00</div>
+          </div>
+        </div>
+        <div id="revisionExpiredWrap" style="display:none;">
+          <div class="revision-expired-msg">⏱ Το παράθυρο επεξεργασίας έληξε.<br>Η ψήφος σου είναι οριστική.</div>
+        </div>
         <div id="unlockBarWrap" class="unlock-progress-wrap" style="display:none">
           <div class="unlock-hd">
             <div class="unlock-hd-txt">🔒 Ψήφισε για να ξεκλειδώσεις τα stats</div>
@@ -603,13 +832,35 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
           <div class="vtab" onclick="setVtab(this,'vt-stars')">⭐ ΑΣΤΕΡΙΑ</div>
         </div>
         <div id="vt-slider">
+          <!-- Exposure level selector (2.2) — pre-vote, 1 tap -->
+          <div class="exposure-wrap" id="exposureWrap">
+            <div class="exposure-label">Πόσο είδες;</div>
+            <div class="exposure-options">
+              <div class="exp-btn" onclick="selectExposure(this,'full')">
+                <div class="exp-btn-ico">📺</div>
+                <div class="exp-btn-lbl">Ολόκληρο</div>
+              </div>
+              <div class="exp-btn" onclick="selectExposure(this,'second_half')">
+                <div class="exp-btn-ico">⏱</div>
+                <div class="exp-btn-lbl">Β' Ημίχρονο</div>
+              </div>
+              <div class="exp-btn" onclick="selectExposure(this,'highlights')">
+                <div class="exp-btn-ico">🎬</div>
+                <div class="exp-btn-lbl">Highlights</div>
+              </div>
+              <div class="exp-btn" onclick="selectExposure(this,'no_watch')">
+                <div class="exp-btn-ico">👁</div>
+                <div class="exp-btn-lbl">Δεν είδα</div>
+              </div>
+            </div>
+          </div>
           <div class="slider-val-big" id="svBig">72</div>
           <div class="slider-grade" id="sliderGrade" style="color:var(--teal);">ΚΑΛΟΣ</div>
           <input type="range" class="slider-big" min="1" max="100" value="72"
             oninput="onSliderInput(this.value)"/>
           <div class="slider-ends"><span>1 — Αδύναμος</span><span>100 — Θεός</span></div>
           <br/>
-          <button class="vote-submit" id="voteSubmitBtn" onclick="submitVote()">⚡ ΨΗΦΙΣΕ — +5 XP</button>
+          <button class="vote-submit" id="voteSubmitBtn" onclick="submitVote()">⚡ ΨΗΦΙΣΕ</button>
         </div>
         <div id="vt-stars" style="display:none">
           <div class="stars-row" id="starsRow">
@@ -619,7 +870,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
             <div class="star-btn on" onclick="setStar(4)">⭐</div>
             <div class="star-btn" onclick="setStar(5)">⭐</div>
           </div>
-          <button class="vote-submit" onclick="submitVote()">⚡ ΨΗΦΙΣΕ — +5 XP</button>
+          <button class="vote-submit" onclick="submitVote()">⚡ ΨΗΦΙΣΕ</button>
         </div>
       </div>
     </div>
@@ -651,6 +902,74 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     </div>
 
     <button class="logout-btn" onclick="logout()">ΑΠΟΣΥΝΔΕΣΗ</button>
+  </div>
+</div>
+
+<!-- ═══════════ REVELATION SCREEN (2.4) ═══════════ -->
+<div id="revelationOverlay" class="revelation-overlay" style="display:none;">
+  <div class="revelation-inner">
+    <div class="rev-player-name" id="revPlayerName">—</div>
+
+    <div class="rev-your-score-wrap">
+      <div class="rev-your-label">Η ψήφος σου</div>
+      <div class="rev-your-score" id="revYourScore">—</div>
+    </div>
+
+    <div class="rev-divider"></div>
+
+    <div class="rev-stats-row">
+      <div class="rev-stat highlight">
+        <div class="rev-stat-val" id="revBayesian">—</div>
+        <div class="rev-stat-lbl">Bayesian</div>
+      </div>
+      <div class="rev-stat">
+        <div class="rev-stat-val" id="revVoteCount">—</div>
+        <div class="rev-stat-lbl">Ψήφοι</div>
+      </div>
+      <div class="rev-stat">
+        <div class="rev-stat-val" id="revRank">—</div>
+        <div class="rev-stat-lbl">Rank</div>
+      </div>
+    </div>
+
+    <!-- 2.3 Attribute tag — injected here -->
+    <div class="rev-tag-section" id="revTagSection"></div>
+
+    <!-- 2.5 Confidence — injected here -->
+    <div class="rev-conf-section" id="revConfSection"></div>
+
+    <button class="rev-continue-btn" onclick="closeRevelation()">
+      ΣΥΝΕΧΕΙΑ →
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════ TOS MODAL (1.3) ═══════════ -->
+<div id="tosOverlay" class="tos-overlay" style="display:none;">
+  <div class="tos-sheet">
+    <div class="tos-title">Όροι Χρήσης</div>
+    <div class="tos-body">
+      <strong>Τι συλλέγει το FANSCORE:</strong><br>
+      Οι ψήφοι σου για παίκτες καταχωρούνται ανώνυμα και αθροίζονται στατιστικά.
+      Δεν πωλούνται προσωπικά δεδομένα σε τρίτους.<br><br>
+      <strong>Πώς χρησιμοποιούνται τα δεδομένα:</strong><br>
+      Οι συλλογικές αξιολογήσεις παραμένουν ως dataset — δεν μπορούν να αναιρεθούν
+      μετά την υποβολή τους. Κάθε ψήφος είναι immutable μετά το παράθυρο επεξεργασίας.<br><br>
+      <strong>Ακεραιότητα δεδομένων:</strong><br>
+      Απαγορεύεται η χειραγώγηση του συστήματος (bots, πολλαπλοί λογαριασμοί,
+      συντονισμένη ψηφοφορία). Παραβάσεις οδηγούν σε αποκλεισμό.
+    </div>
+    <div class="tos-check-row" onclick="toggleTosCheck()">
+      <div class="tos-checkbox" id="tosCheckbox"></div>
+      <div class="tos-check-label">
+        Διάβασα και αποδέχομαι τους <a href="#" onclick="return false;">Όρους Χρήσης</a>
+        του FANSCORE
+      </div>
+    </div>
+    <button class="tos-accept-btn" id="tosAcceptBtn" disabled onclick="acceptTos()">
+      ΑΠΟΔΟΧΗ ΚΑΙ ΣΥΝΕΧΕΙΑ
+    </button>
+    <div class="tos-cancel" onclick="closeTosModal()">Ακύρωση</div>
   </div>
 </div>
 
@@ -689,7 +1008,8 @@ let currentPlayer  = null;
 let prevPage       = 'page-home';
 let allPlayers     = [];
 let selectedStars  = 4;
-let myVotes        = {}; // { player_id: score }
+let myVotes          = {}; // { player_id: score }
+let myVoteTimestamps = {}; // { player_id: created_at ISO string } — για revision window
 
 const AVATARS    = ['⚽','🧑🏽','🧑🏻','🧑🏼','🧔🏻','🧑🏾','🧑🏿','👨🏻','👨🏽','👨🏾'];
 const CARD_TYPES = ['gold','teal','blue','silver','purple'];
@@ -775,7 +1095,7 @@ async function showMain() {
   document.getElementById('mainHeader').style.display = 'block';
   document.getElementById('mainNav').style.display = 'block';
   showPage('page-home');
-  await loadPlayers();
+  await Promise.all([loadPlayers(), loadActiveMatch()]);
   await loadMyVotes();
 }
 
@@ -819,10 +1139,8 @@ function updateProfileUI() {
   const streak = currentProfile.streak || 0;
   const name   = currentProfile.username || 'Scout';
 
-  // Header
-  document.getElementById('xpCount').textContent = xp + ' XP';
-  document.getElementById('xpFill').style.width  = Math.min(100, (xp / 500) * 100) + '%';
-  document.getElementById('streakN').textContent  = streak;
+  // Header — streak only
+  document.getElementById('streakN').textContent = streak;
 
   // Profile page
   document.getElementById('profileName').textContent  = name;
@@ -831,8 +1149,7 @@ function updateProfileUI() {
 
   const level      = xp < 100 ? 'BRONZE' : xp < 300 ? 'SILVER' : xp < 600 ? 'GOLD' : 'EXPERT';
   const levelEmoji = xp < 100 ? '🥉'     : xp < 300 ? '🥈'     : xp < 600 ? '🥇'   : '💎';
-  document.getElementById('levelBadge').textContent    = level;
-  document.getElementById('profileLevel').textContent  = levelEmoji + ' ' + level + ' SCOUT';
+  document.getElementById('profileLevel').textContent = levelEmoji + ' ' + level + ' SCOUT';
 
   const av = document.getElementById('profileAv');
   if (currentUser?.user_metadata?.avatar_url) {
@@ -846,12 +1163,16 @@ function updateProfileUI() {
 async function loadMyVotes() {
   if (!currentUser) return;
   const { data } = await db.from('votes')
-    .select('player_id, score')
+    .select('player_id, score, created_at')
     .eq('user_id', currentUser.id)
     .eq('is_active', true);
 
   myVotes = {};
-  if (data) data.forEach(v => { myVotes[v.player_id] = v.score; });
+  myVoteTimestamps = {};
+  if (data) data.forEach(v => {
+    myVotes[v.player_id]          = v.score;
+    myVoteTimestamps[v.player_id] = v.created_at;
+  });
 
   // Profile vote count
   document.getElementById('pVotes').textContent = data?.length || 0;
@@ -885,15 +1206,18 @@ function renderRecentVotes(votes) {
 
 // ═══════════════════════════════════════════
 // PLAYERS — load from server aggregates
+// Uses get_player_aggregates_for_user() RPC — score fields
+// are NULL server-side when user has not voted (A1 fix).
 // ═══════════════════════════════════════════
 async function loadPlayers() {
-  // Φόρτωση παικτών + aggregates παράλληλα
-  const [{ data: playersData, error }, { data: aggregates }] = await Promise.all([
+  // Φόρτωση παικτών + vote-gated aggregates παράλληλα
+  const [{ data: playersData, error }, { data: aggregates, error: aggErr }] = await Promise.all([
     db.from('players').select('*').order('name'),
-    db.from('player_aggregates').select('player_id, bayesian_score, vote_count, rank_globally, status, vote_distribution')
+    db.rpc('get_player_aggregates_for_user')
   ]);
 
-  if (error) { console.error(error); return; }
+  if (error) { console.error('players fetch error:', error); return; }
+  if (aggErr) { console.error('aggregates RPC error:', aggErr); }
 
   // Map aggregates ανά player_id
   const aggMap = {};
@@ -902,16 +1226,19 @@ async function loadPlayers() {
   allPlayers = (playersData || []).map((p, i) => {
     const agg        = aggMap[p.id];
     const voteCount  = agg?.vote_count || 0;
+    const hasVoted   = agg?.user_has_voted || false;
+    // bayesian_score is NULL from server when user hasn't voted
     const score      = agg?.bayesian_score ? Math.round(parseFloat(agg.bayesian_score)) : null;
-    const isVisible  = ['emerging', 'rated', 'established'].includes(agg?.status);
+    const isVisible  = ['emerging', 'established'].includes(agg?.status);
 
     return {
       ...p,
       voteCount,
-      avgScore:        isVisible ? score : null,
+      avgScore:        score,       // NULL if not voted (server-enforced)
       voteDist:        agg?.vote_distribution || null,
       rankGlobally:    agg?.rank_globally || null,
       status:          agg?.status || 'unrated',
+      hasVoted,                     // server-confirmed vote status
       cardType:        CARD_TYPES[i % CARD_TYPES.length],
       avatar:          AVATARS[i % AVATARS.length],
       locked:          !isVisible
@@ -942,9 +1269,11 @@ function renderHotCards() {
 }
 
 function buildFifaCard(p, i) {
-  const rating = p.avgScore || '?';
-  const type   = p.cardType;
+  const type    = p.cardType;
   const myScore = myVotes[p.id];
+  // avgScore is NULL from server if user hasn't voted (A1: server-enforced)
+  const scoreShown = p.avgScore != null;
+  const rating     = scoreShown ? p.avgScore : '?';
 
   const statsHtml = p.locked
     ? `<div class="card-locked-overlay">
@@ -952,11 +1281,17 @@ function buildFifaCard(p, i) {
         <div class="lock-mini-bar"><div class="lock-mini-fill" style="width:${Math.min(100,(p.voteCount/5)*100)}%"></div></div>
         <div class="lock-votes">${p.voteCount} / 5 ψήφοι</div>
        </div>`
-    : `<div class="card-divider"></div>
-       <div class="card-stats">
-         <div class="cs"><div class="cs-val">${rating}</div><div class="cs-lbl">RATING</div></div>
-         <div class="cs"><div class="cs-val">${p.voteCount}</div><div class="cs-lbl">ΨΗΦΟΙ</div></div>
-       </div>`;
+    : scoreShown
+      ? `<div class="card-divider"></div>
+         <div class="card-stats">
+           <div class="cs"><div class="cs-val">${rating}</div><div class="cs-lbl">RATING</div></div>
+           <div class="cs"><div class="cs-val">${p.voteCount}</div><div class="cs-lbl">ΨΗΦΟΙ</div></div>
+         </div>`
+      : `<div class="card-divider"></div>
+         <div class="card-stats">
+           <div class="cs"><div class="cs-val score-concealed">???</div><div class="cs-lbl">RATING</div></div>
+           <div class="cs"><div class="cs-val">${p.voteCount}</div><div class="cs-lbl">ΨΗΦΟΙ</div></div>
+         </div>`;
 
   const myBadge = myScore
     ? `<div style="position:absolute;top:6px;right:6px;background:rgba(0,240,200,0.15);border:1px solid var(--teal3);border-radius:3px;padding:1px 5px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:9px;color:var(--teal);">✓${myScore}</div>`
@@ -966,7 +1301,7 @@ function buildFifaCard(p, i) {
     <div class="fifa-card ${type}" onclick="openPlayer('${p.id}')" style="animation-delay:${i*0.05}s">
       ${myBadge}
       <div class="card-top"><div class="card-left-info">
-        <div class="card-rating">${p.locked ? '?' : rating}</div>
+        <div class="card-rating">${rating}</div>
         <div class="card-pos">${p.position?.substring(0,3).toUpperCase() || 'MID'}</div>
       </div></div>
       <div class="card-img-wrap"><div class="card-avatar">${p.avatar}</div></div>
@@ -976,8 +1311,9 @@ function buildFifaCard(p, i) {
 }
 
 function renderRankList() {
+  // Only show players where user has a score (server returns NULL if not voted)
   const sorted = [...allPlayers]
-    .filter(p => !p.locked && p.avgScore)
+    .filter(p => !p.locked && p.avgScore != null)
     .sort((a, b) => (b.avgScore - a.avgScore));
 
   const medals  = ['g','s','b','o','o','o'];
@@ -996,16 +1332,24 @@ function renderRankList() {
         <div class="rank-votes">${p.voteCount} ψήφοι</div>
       </div>
     </div>`).join('')
-    || '<div class="empty-state"><div class="empty-ico">📊</div>Δεν υπάρχουν αξιολογήσεις ακόμα</div>';
+    || '<div class="empty-state"><div class="empty-ico">🔒</div>Ψήφισε παίκτες για να δεις το ranking</div>';
 }
 
 function renderAllPlayers() {
   const sorted = [...allPlayers].sort((a, b) => {
     if (a.locked !== b.locked) return a.locked ? 1 : -1;
+    // Players with scores (voted) first, then by score desc
+    if ((a.avgScore != null) !== (b.avgScore != null)) return a.avgScore != null ? -1 : 1;
     return (b.avgScore || 0) - (a.avgScore || 0);
   });
   const medals = ['g','s','b'];
-  document.getElementById('allPlayersList').innerHTML = sorted.map((p, i) => `
+  document.getElementById('allPlayersList').innerHTML = sorted.map((p, i) => {
+    const scoreDisplay = p.locked
+      ? '<span style="color:var(--txt3);font-size:16px;">🔒</span>'
+      : p.avgScore != null
+        ? p.avgScore
+        : '<span class="score-concealed">???</span>';
+    return `
     <div class="rank-row" onclick="openPlayer('${p.id}')" style="animation-delay:${i*0.03}s">
       <div class="rank-n ${medals[i]||'o'}">${i+1}</div>
       <div class="rank-av">${p.avatar}</div>
@@ -1014,35 +1358,65 @@ function renderAllPlayers() {
         <div class="rank-sub">${p.team} · ${p.position}</div>
       </div>
       <div class="rank-score">
-        <div class="rank-val">${p.locked ? '<span style="color:var(--txt3);font-size:16px;">???</span>' : (p.avgScore||'—')}</div>
+        <div class="rank-val">${scoreDisplay}</div>
         <div class="rank-votes">${p.voteCount} ψήφοι</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════════
 // PLAYER DETAIL
 // ═══════════════════════════════════════════
+
+// scoreVisible: true only if server confirmed user has voted
+// This is the core of 1.1 — independence of every vote
+function canSeeScore(playerId) {
+  const p = allPlayers.find(x => x.id === playerId);
+  return !!myVotes[playerId] || (p?.hasVoted === true);
+}
+
 function openPlayer(id) {
   const p = allPlayers.find(x => x.id === id);
   if (!p) return;
   currentPlayer = p;
 
+  const myScore    = myVotes[p.id];
+  const hasVoted   = !!myScore || p.hasVoted;
+  // Score visible only if server returned a score (NULL when not voted)
+  const scoreShown = p.avgScore != null;
+
   document.getElementById('d-name').textContent   = p.name.toUpperCase();
   document.getElementById('d-team').textContent   = p.team.toUpperCase();
   document.getElementById('d-pos').textContent    = p.position?.substring(0,3).toUpperCase() || 'MID';
   document.getElementById('d-avatar').textContent = p.avatar;
-  document.getElementById('d-rating').textContent = p.locked ? '?' : (p.avgScore || '—');
 
+  // 1.1 — Big rating: hide until voted
+  const ratingEl = document.getElementById('d-rating');
+  if (scoreShown) {
+    ratingEl.textContent = p.avgScore || '—';
+    ratingEl.classList.add('score-revealed');
+  } else {
+    ratingEl.textContent = '?';
+    ratingEl.classList.remove('score-revealed');
+  }
+
+  // 1.4 — Status badge next to rating
+  const statusBadge = buildStatusBadge(p, hasVoted);
+  const existingBadge = document.getElementById('d-status-badge');
+  if (existingBadge) existingBadge.remove();
+  if (statusBadge) ratingEl.insertAdjacentHTML('afterend', statusBadge);
+
+  // Stats grid — voteCount always shown, score only after voting
   document.getElementById('d-stats-grid').innerHTML = `
-    <div class="bst"><div class="bst-val">${p.avgScore||'?'}</div><div class="bst-lbl">RATING</div></div>
+    <div class="bst"><div class="bst-val ${scoreShown?'':'score-concealed'}">${scoreShown ? (p.avgScore||'—') : '???'}</div><div class="bst-lbl">RATING</div></div>
     <div class="bst"><div class="bst-val">${p.voteCount}</div><div class="bst-lbl">ΨΗΦΟΙ</div></div>
     <div class="bst"><div class="bst-val">${p.age||'—'}</div><div class="bst-lbl">ΗΛΙΚΙΑ</div></div>
     <div class="bst"><div class="bst-val">${p.nationality||'GR'}</div><div class="bst-lbl">ΕΘΝΙΚ.</div></div>`;
 
-  buildFMRows(p);
-  buildRadar(p);
-  buildVoteDist(p);
+  buildFMRows(p, scoreShown);
+  buildRadar(p, scoreShown);
+  buildVoteDist(p, scoreShown);
 
   // Unlock bar — threshold 5 (cold_start_unrated)
   if (p.locked) {
@@ -1053,28 +1427,86 @@ function openPlayer(id) {
     document.getElementById('unlockBarWrap').style.display = 'none';
   }
 
-  // My vote tag
-  const myScore = myVotes[p.id];
-  const tag     = document.getElementById('myVoteTag');
+  // Vote-to-reveal prompt (shown only for non-locked, non-voted players)
+  const vtrWrap = document.getElementById('voteToRevealWrap');
+  if (!p.locked && !hasVoted && p.status !== 'unrated') {
+    vtrWrap.style.display = 'flex';
+  } else {
+    vtrWrap.style.display = 'none';
+  }
+
+  // My vote tag + button state + revision window
+  const tag = document.getElementById('myVoteTag');
   if (myScore) {
-    tag.textContent  = '✓ ΨΗΦΟΣ ΜΟΥ: ' + myScore;
+    tag.textContent   = '✓ ΨΗΦΟΣ ΜΟΥ: ' + myScore;
     tag.style.display = 'inline';
-    // Pre-fill slider
     const slider = document.querySelector('.slider-big');
     if (slider) { slider.value = myScore; onSliderInput(myScore); }
-    document.getElementById('voteSubmitBtn').textContent = '🔄 ΑΛΛΑΓΗ ΨΗΦΟΥ';
+
+    // 1.2 — Check revision window from stored vote timestamp
+    const voteCreatedAt = myVoteTimestamps[p.id];
+    if (voteCreatedAt) {
+      const msLeft = new Date(voteCreatedAt).getTime() + REVISION_WINDOW_MS - Date.now();
+      if (msLeft > 0) {
+        startRevisionTimer(voteCreatedAt);
+      } else {
+        // Window already expired
+        hideRevisionUI();
+        document.getElementById('revisionExpiredWrap').style.display = 'block';
+        document.getElementById('voteSubmitBtn').disabled    = true;
+        document.getElementById('voteSubmitBtn').textContent = '⏱ ΠΑΡΑΘΥΡΟ ΕΛΗΞΕ';
+      }
+    } else {
+      // No timestamp stored — vote predates this session, treat as expired
+      hideRevisionUI();
+      document.getElementById('revisionExpiredWrap').style.display = 'block';
+      document.getElementById('voteSubmitBtn').disabled    = true;
+      document.getElementById('voteSubmitBtn').textContent = '⏱ ΠΑΡΑΘΥΡΟ ΕΛΗΞΕ';
+    }
   } else {
     tag.style.display = 'none';
-    document.getElementById('voteSubmitBtn').textContent = '⚡ ΨΗΦΙΣΕ — +5 XP';
+    hideRevisionUI();
+    document.getElementById('voteSubmitBtn').disabled    = false;
+    document.getElementById('voteSubmitBtn').textContent = '⚡ ΨΗΦΙΣΕ';
   }
 
   prevPage = document.querySelector('.page.active')?.id || 'page-home';
+  resetExposure();
+  renderMatchContext();
+
+  // Bias indicator (2.6)
+  const isBias = currentProfile?.fav_team_id
+    && currentPlayer?.team_id
+    && currentProfile.fav_team_id === currentPlayer.team_id;
+  document.getElementById('biasIndicatorWrap').style.display = isBias ? 'block' : 'none';
+
   gotoPage('page-player');
 }
 
-function buildFMRows(p) {
+// 1.4 — Build status badge HTML based on player status and whether user has voted
+function buildStatusBadge(p, hasVoted) {
+  if (p.locked) return null; // unrated — no badge, handled by unlock bar
+
+  if (p.status === 'emerging') {
+    // Dots reflect actual confidence: vote_count vs cold_start_established (20)
+    // emerging range is 5-19 votes, so max dots filled = 4 out of 5
+    const threshold = 20; // cold_start_established — should come from system_config in V3
+    const filledCount = Math.max(1, Math.min(4, Math.round((p.voteCount / threshold) * 5)));
+    const dots = [1,2,3,4,5].map(i =>
+      `<div class="conf-dot${i <= filledCount ? ' filled' : ''}"></div>`
+    ).join('');
+    return `<div id="d-status-badge" style="margin-top:6px;">
+      <span class="status-badge emerging">⬡ EMERGING</span>
+      <div class="conf-dots" title="Εμπιστοσύνη: ${p.voteCount}/20 ψήφοι">${dots}</div>
+    </div>`;
+  }
+
+  return null;
+}
+
+function buildFMRows(p, scoreShown) {
   const stats = [
-    { lbl:'Bayesian Score', val: p.locked ? null : p.avgScore },
+    { lbl:'Bayesian Score', val: scoreShown ? p.avgScore : null, concealed: !scoreShown && !p.locked },
     { lbl:'Αριθμός Ψήφων',  val: p.voteCount },
     { lbl:'Ηλικία',         val: p.age },
     { lbl:'Εθνικότητα',     val: p.nationality === 'GR' ? 'Ελλάδα' : (p.nationality||'—') },
@@ -1083,20 +1515,23 @@ function buildFMRows(p) {
     const isNum = typeof s.val === 'number';
     const cls   = !isNum ? '' : s.val >= 70 ? 'hi' : s.val >= 50 ? 'mid' : 'lo';
     const w     = isNum ? s.val : 0;
+    const isLocked   = s.val === null && !s.concealed;
+    const isConcealed = s.concealed;
     return `<div class="fm-row">
       <div class="fm-lbl">${s.lbl}</div>
-      <div class="fm-bar"><div class="fm-fill ${s.val===null?'locked':cls}" style="width:${s.val===null?100:Math.min(100,w)}%"></div></div>
-      <div class="fm-num${s.val===null?' locked':''}">${s.val===null?'???':s.val}</div>
+      <div class="fm-bar"><div class="fm-fill ${isLocked?'locked':isConcealed?'locked':cls}" style="width:${(isLocked||isConcealed)?100:Math.min(100,w)}%"></div></div>
+      <div class="fm-num${(isLocked||isConcealed)?' locked':''}">${isLocked?'???':isConcealed?'???':s.val}</div>
     </div>`;
   }).join('');
 }
 
-function buildRadar(p) {
+function buildRadar(p, scoreShown) {
   const svg = document.getElementById('radarSvg');
   const cx=100, cy=100, r=72;
   const keys    = ['Rating','Ψήφοι','Ομάδα','Θέση','Εθνικ.','Ηλικία'];
   const rawVals = [p.avgScore||0, Math.min(100,p.voteCount*5), 70, 65, 75, 70];
-  const vals    = p.locked ? [0,0,0,0,0,0] : rawVals;
+  // Conceal score axis if not voted yet (1.1)
+  const vals    = (!scoreShown) ? [0,rawVals[1],0,0,0,0] : rawVals;
   const n = keys.length;
   const toXY = (i, val) => {
     const angle = (Math.PI*2/n)*i - Math.PI/2;
@@ -1125,9 +1560,9 @@ function buildRadar(p) {
     ${labels}`;
 }
 
-function buildVoteDist(p) {
+function buildVoteDist(p, scoreShown) {
   const wrap = document.getElementById('voteDistWrap');
-  if (!p.voteDist || p.locked) { wrap.style.display='none'; return; }
+  if (!p.voteDist || !scoreShown) { wrap.style.display='none'; return; }
 
   const dist   = p.voteDist;
   const keys   = ['1-20','21-40','41-60','61-80','81-100'];
@@ -1149,6 +1584,364 @@ function buildVoteDist(p) {
 }
 
 // ═══════════════════════════════════════════
+// ATTRIBUTE TAG (2.3)
+// ═══════════════════════════════════════════
+let selectedTag = null;
+
+const ATTRIBUTE_TAGS = [
+  { value: 'passing',        ico: '🎯', lbl: 'Πάσα'      },
+  { value: 'defending',      ico: '🛡', lbl: 'Άμυνα'     },
+  { value: 'leadership',     ico: '👊', lbl: 'Ηγεσία'    },
+  { value: 'speed',          ico: '⚡', lbl: 'Ταχύτητα'  },
+  { value: 'decision_making',ico: '🧠', lbl: 'Κρίση'     },
+  { value: 'off_ball',       ico: '🏃', lbl: 'Χωρίς μπάλα'},
+];
+
+function renderTagSection() {
+  const section = document.getElementById('revTagSection');
+  selectedTag   = null;
+
+  section.innerHTML = `
+    <div class="rev-tag-label">Τι σε εντυπωσίασε;</div>
+    <div class="rev-tag-options">
+      ${ATTRIBUTE_TAGS.map(t => `
+        <div class="tag-btn" onclick="selectTag(this,'${t.value}')">
+          <div class="tag-btn-ico">${t.ico}</div>
+          <div class="tag-btn-lbl">${t.lbl}</div>
+        </div>`).join('')}
+    </div>
+    <div class="tag-skip" onclick="skipTag()">Παράλειψη</div>`;
+}
+
+function selectTag(el, value) {
+  selectedTag = value;
+  document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  // Auto-submit tag after brief delay — gesture density
+  setTimeout(() => submitTag(), 400);
+}
+
+function skipTag() {
+  selectedTag = null;
+  document.getElementById('revTagSection').innerHTML = '';
+  renderConfSection(); // move to 2.5
+}
+
+async function submitTag() {
+  if (!currentPlayer || !selectedTag) return;
+
+  // Update vote with attribute_tag via cast_vote (revision window still open at this point)
+  // We pass the same score — only attribute_tag changes
+  const currentScore = myVotes[currentPlayer.id];
+  if (currentScore) {
+    await Engine.dispatch('VOTE_PLAYER', {
+      playerId:     currentPlayer.id,
+      score:        currentScore,
+      matchId:      activeMatch?.id || null,
+      attributeTag: selectedTag
+    });
+  }
+
+  // Collapse tag section, show confidence
+  document.getElementById('revTagSection').innerHTML =
+    `<div style="text-align:center;font-size:11px;color:var(--purple);
+      font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;">
+      ✓ ${ATTRIBUTE_TAGS.find(t=>t.value===selectedTag)?.lbl || selectedTag}
+    </div>`;
+
+  renderConfSection();
+}
+
+// ═══════════════════════════════════════════
+// CONFIDENCE LEVEL (2.5)
+// ═══════════════════════════════════════════
+let selectedConfidence = null;
+
+function renderConfSection() {
+  const section = document.getElementById('revConfSection');
+  selectedConfidence = null;
+
+  section.innerHTML = `
+    <div class="rev-conf-label">Πόσο σίγουρος είσαι;</div>
+    <div class="conf-dots">
+      ${[1,2,3,4,5].map(n => `
+        <div class="conf-dot" onclick="selectConfidence(this,${n})">${n}</div>
+      `).join('')}
+    </div>
+    <div class="conf-skip" onclick="skipConfidence()">Παράλειψη</div>`;
+}
+
+function selectConfidence(el, value) {
+  selectedConfidence = value;
+  document.querySelectorAll('.conf-dot').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+  setTimeout(() => submitConfidence(), 400);
+}
+
+function skipConfidence() {
+  selectedConfidence = null;
+  document.getElementById('revConfSection').innerHTML = '';
+}
+
+async function submitConfidence() {
+  if (!currentPlayer || !selectedConfidence) return;
+
+  const currentScore = myVotes[currentPlayer.id];
+  if (currentScore) {
+    await Engine.dispatch('VOTE_PLAYER', {
+      playerId:    currentPlayer.id,
+      score:       currentScore,
+      matchId:     activeMatch?.id || null,
+      confidence:  selectedConfidence
+    });
+  }
+
+  document.getElementById('revConfSection').innerHTML =
+    `<div style="text-align:center;font-size:11px;color:var(--blue);
+      font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;">
+      ✓ Βεβαιότητα ${selectedConfidence}/5
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+// REVELATION SCREEN (2.4)
+// ═══════════════════════════════════════════
+function showRevelation(playerName, yourScore, result) {
+  document.getElementById('revPlayerName').textContent  = playerName.toUpperCase();
+  document.getElementById('revYourScore').textContent   = yourScore;
+
+  // Fresh aggregates from server response
+  const bayesian  = result.bayesian_score
+    ? Math.round(parseFloat(result.bayesian_score)) : '—';
+  const voteCount = result.vote_count   ?? '—';
+  const rank      = result.rank_globally ? '#' + result.rank_globally : '—';
+
+  document.getElementById('revBayesian').textContent  = bayesian;
+  document.getElementById('revVoteCount').textContent = voteCount;
+  document.getElementById('revRank').textContent      = rank;
+
+  // Clear sections then render tag (2.3) — confidence (2.5) follows after tag
+  document.getElementById('revConfSection').innerHTML = '';
+  renderTagSection();
+
+  document.getElementById('revelationOverlay').style.display = 'flex';
+}
+
+function closeRevelation() {
+  document.getElementById('revelationOverlay').style.display = 'none';
+  // Re-open player detail so score is now visible (1.1 reveal)
+  if (currentPlayer) openPlayer(currentPlayer.id);
+}
+
+// ═══════════════════════════════════════════
+// EXPOSURE LEVEL (2.2)
+// ═══════════════════════════════════════════
+let selectedExposure = null; // 'full' | 'second_half' | 'highlights' | 'no_watch' | null
+
+function selectExposure(el, value) {
+  selectedExposure = value;
+  document.querySelectorAll('.exp-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function resetExposure() {
+  selectedExposure = null;
+  document.querySelectorAll('.exp-btn').forEach(b => b.classList.remove('selected'));
+}
+
+// ═══════════════════════════════════════════
+// MATCH CONTEXT (2.1)
+// ═══════════════════════════════════════════
+let activeMatch = null; // current match object or null
+
+async function loadActiveMatch() {
+  // Fetch live match first, then today's scheduled
+  const today = new Date();
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+  const todayEnd   = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
+
+  // Priority 1: live match
+  let { data: live } = await db.from('matches')
+    .select('id, status, match_date, matchday, season, home_team_id, away_team_id, teams!matches_home_team_id_fkey(name), away:teams!matches_away_team_id_fkey(name)')
+    .eq('status', 'live')
+    .limit(1)
+    .maybeSingle();
+
+  if (live) { activeMatch = live; return; }
+
+  // Priority 2: scheduled today
+  let { data: scheduled } = await db.from('matches')
+    .select('id, status, match_date, matchday, season, home_team_id, away_team_id, teams!matches_home_team_id_fkey(name), away:teams!matches_away_team_id_fkey(name)')
+    .eq('status', 'scheduled')
+    .gte('match_date', todayStart)
+    .lt('match_date', todayEnd)
+    .order('match_date', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  activeMatch = scheduled || null;
+}
+
+function renderMatchContext() {
+  const wrap = document.getElementById('matchContextWrap');
+  if (!activeMatch) { wrap.style.display = 'none'; return; }
+
+  const homeName = activeMatch.teams?.name || '—';
+  const awayName = activeMatch.away?.name  || '—';
+
+  document.getElementById('matchContextTeams').textContent =
+    `${homeName} — ${awayName}`;
+
+  const matchDate = new Date(activeMatch.match_date);
+  const timeStr   = matchDate.toLocaleTimeString('el-GR', { hour: '2-digit', minute: '2-digit' });
+  const mdStr     = activeMatch.matchday ? `Αγ. ${activeMatch.matchday}` : '';
+  document.getElementById('matchContextMeta').textContent =
+    [mdStr, timeStr].filter(Boolean).join(' · ');
+
+  const badge = document.getElementById('matchContextBadge');
+  if (activeMatch.status === 'live') {
+    badge.innerHTML = `<div class="match-live-badge"><div class="live-dot"></div>LIVE</div>`;
+  } else {
+    badge.innerHTML = `<div class="match-scheduled-badge">ΣΗΜΕΡΑ</div>`;
+  }
+
+  wrap.style.display = 'block';
+}
+
+// ═══════════════════════════════════════════
+// REVISION WINDOW (1.2)
+// ═══════════════════════════════════════════
+let revisionTimer      = null;  // setInterval handle
+let revisionExpiresAt  = null;  // Date object — when window closes
+
+const REVISION_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+
+function startRevisionTimer(voteCreatedAt) {
+  // voteCreatedAt: ISO string from server response or existing vote
+  clearRevisionTimer();
+
+  const createdAt = new Date(voteCreatedAt);
+  revisionExpiresAt = new Date(createdAt.getTime() + REVISION_WINDOW_MS);
+
+  updateRevisionUI();
+
+  // Tick every second
+  revisionTimer = setInterval(updateRevisionUI, 1000);
+}
+
+function clearRevisionTimer() {
+  if (revisionTimer) { clearInterval(revisionTimer); revisionTimer = null; }
+  revisionExpiresAt = null;
+}
+
+function isRevisionOpen() {
+  if (!revisionExpiresAt) return false;
+  return new Date() < revisionExpiresAt;
+}
+
+function updateRevisionUI() {
+  const revWrap     = document.getElementById('revisionWrap');
+  const expWrap     = document.getElementById('revisionExpiredWrap');
+  const submitBtn   = document.getElementById('voteSubmitBtn');
+  const countdown   = document.getElementById('revisionCountdown');
+
+  if (!revisionExpiresAt) return;
+
+  const msLeft = revisionExpiresAt - new Date();
+
+  if (msLeft <= 0) {
+    // Window expired
+    clearRevisionTimer();
+    revWrap.style.display   = 'none';
+    expWrap.style.display   = 'block';
+    submitBtn.disabled      = true;
+    submitBtn.textContent   = '⏱ ΠΑΡΑΘΥΡΟ ΕΛΗΞΕ';
+    return;
+  }
+
+  // Still open — show countdown
+  revWrap.style.display   = 'block';
+  expWrap.style.display   = 'none';
+  submitBtn.disabled      = false;
+  submitBtn.textContent   = '🔄 ΑΛΛΑΓΗ ΨΗΦΟΥ';
+
+  const totalSec  = Math.ceil(msLeft / 1000);
+  const mins      = Math.floor(totalSec / 60);
+  const secs      = totalSec % 60;
+  const display   = `${mins}:${String(secs).padStart(2,'0')}`;
+
+  countdown.textContent = display;
+  // Visual urgency under 60 seconds
+  countdown.className = 'revision-countdown' + (totalSec <= 60 ? ' urgent' : '');
+}
+
+function hideRevisionUI() {
+  clearRevisionTimer();
+  document.getElementById('revisionWrap').style.display   = 'none';
+  document.getElementById('revisionExpiredWrap').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════
+// TOS GATE (1.3)
+// ═══════════════════════════════════════════
+let tosChecked = false;
+let pendingVoteAfterTos = false; // resume vote after TOS acceptance
+
+function hasTosAccepted() {
+  return !!(currentProfile?.tos_accepted_at);
+}
+
+function showTosModal() {
+  // Reset state each time modal opens
+  tosChecked = false;
+  document.getElementById('tosCheckbox').classList.remove('checked');
+  document.getElementById('tosAcceptBtn').disabled = true;
+  document.getElementById('tosOverlay').style.display = 'flex';
+}
+
+function closeTosModal() {
+  pendingVoteAfterTos = false;
+  document.getElementById('tosOverlay').style.display = 'none';
+}
+
+function toggleTosCheck() {
+  tosChecked = !tosChecked;
+  document.getElementById('tosCheckbox').classList.toggle('checked', tosChecked);
+  document.getElementById('tosAcceptBtn').disabled = !tosChecked;
+}
+
+async function acceptTos() {
+  const btn = document.getElementById('tosAcceptBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ ΑΠΟΘΗΚΕΥΣΗ...';
+
+  // RPC: accept_tos() — SECURITY DEFINER, writes tos_accepted_at = now()
+  // TODO (pre-launch): create accept_tos() RPC in Supabase
+  // Signature: accept_tos() → void, sets profiles.tos_accepted_at = now() for auth.uid()
+  const { error } = await db.rpc('accept_tos');
+
+  if (error) {
+    showToast('❌ Σφάλμα αποθήκευσης', 'err');
+    btn.disabled = false;
+    btn.textContent = 'ΑΠΟΔΟΧΗ ΚΑΙ ΣΥΝΕΧΕΙΑ';
+    return;
+  }
+
+  // Update local profile state — no refetch needed
+  if (State.profile) {
+    State.profile.tos_accepted_at = new Date().toISOString();
+  }
+
+  document.getElementById('tosOverlay').style.display = 'none';
+
+  // Resume vote that triggered the TOS modal
+  if (pendingVoteAfterTos) {
+    pendingVoteAfterTos = false;
+    await submitVote();
+  }
+}
+
+// ═══════════════════════════════════════════
 // VOTING
 // ═══════════════════════════════════════════
 async function submitVote() {
@@ -1157,34 +1950,50 @@ async function submitVote() {
 
   if (!currentUser) { showToast('🔒 Συνδέσου για να ψηφίσεις!', 'err'); return; }
 
+  // 1.3 — TOS Gate: block vote if TOS not accepted
+  if (!hasTosAccepted()) {
+    pendingVoteAfterTos = true;
+    showTosModal();
+    return;
+  }
+
   const btn = document.getElementById('voteSubmitBtn');
   btn.disabled = true;
   btn.textContent = '⏳ ΑΠΟΣΤΟΛΗ...';
 
+  const biasDeclared = currentProfile?.fav_team_id
+    && currentPlayer?.team_id
+    && currentProfile.fav_team_id === currentPlayer.team_id
+    ? true : null;
+
   const result = await Engine.dispatch('VOTE_PLAYER', {
-    playerId: currentPlayer.id,
-    score: score
+    playerId:      currentPlayer.id,
+    score:         score,
+    matchId:       activeMatch?.id || null,
+    exposureLevel: selectedExposure,
+    attributeTag:  null,
+    biasDeclared:  biasDeclared
   });
 
   btn.disabled = false;
 
   if (!result.ok) {
     showToast('❌ ' + (result.reason || 'Σφάλμα'), 'err');
-    btn.textContent = '⚡ ΨΗΦΙΣΕ — +5 XP';
+    btn.textContent = '🔄 ΑΛΛΑΓΗ ΨΗΦΟΥ';
     return;
   }
 
-  // Ενημέρωση XP από server response
-  if (result.xp > 0 && State.profile) {
-    State.profile.xp = (State.profile.xp || 0) + result.xp;
-    showToast('⚡ +' + result.xp + ' XP ΚΕΡΔΙΣΕΣ!', 'xp');
-  } else {
-    showToast('✅ Η ψήφος σου καταχωρήθηκε!');
-  }
+  // Update local vote state immediately — enables score reveal
+  myVotes[currentPlayer.id] = score;
+  // Store timestamp for revision window
+  const voteCreatedAt = result.created_at || new Date().toISOString();
+  myVoteTimestamps[currentPlayer.id] = voteCreatedAt;
 
-  updateProfileUI();
+  // Reload aggregates in background
   await loadPlayers();
-  gotoPage(prevPage);
+
+  // Show revelation screen instead of toast
+  showRevelation(currentPlayer.name, score, result);
 }
 
 // ═══════════════════════════════════════════
